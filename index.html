@@ -24,7 +24,7 @@
   html, body { margin: 0; background: var(--bg); color: var(--text); }
   body { font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; padding-bottom: env(safe-area-inset-bottom); }
   button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
-  .wrap { max-width: 720px; margin: 0 auto; padding: 0 12px 32px; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 12px calc(96px + env(safe-area-inset-bottom)); }
 
   header { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 12px 0 8px; }
   .top { display: flex; align-items: center; gap: 10px; }
@@ -101,8 +101,56 @@
   .row .t { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .row .s { font-size: 12px; color: var(--hint); }
   .sbtn { font-size: 13px; padding: 7px 12px; border-radius: 10px; background: var(--bg2); }
-  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #222; color: #fff; padding: 9px 14px; border-radius: 10px; font-size: 13px; z-index: 30; opacity: 0; transition: opacity .2s; pointer-events: none; max-width: 90vw; }
+  .toast { position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: #222; color: #fff; padding: 9px 14px; border-radius: 10px; font-size: 13px; z-index: 30; opacity: 0; transition: opacity .2s; pointer-events: none; max-width: 90vw; }
   .toast.show { opacity: 1; }
+
+  /* ---------------- tablar va seyf */
+  [hidden] { display: none !important; }
+  .nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: var(--bg2); border-top: 1px solid var(--line); display: flex; padding-bottom: env(safe-area-inset-bottom); }
+  .nav button { flex: 1; padding: 8px 0 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; color: var(--hint); }
+  .nav button .i { font-size: 20px; line-height: 1.1; }
+  .nav button.on { color: var(--accent); font-weight: 600; }
+  .inp { width: 100%; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg2); color: var(--text); font: inherit; outline: none; }
+  textarea.inp { min-height: 84px; resize: vertical; }
+  .inp:focus { border-color: var(--accent); }
+  .inp.mono, .mono { font-family: ui-monospace, Menlo, monospace; font-size: 14px; }
+  .btn { display: block; width: 100%; padding: 13px; border-radius: 12px; background: var(--accent); color: #111; font-weight: 700; text-align: center; margin-top: 10px; }
+  .btn.sec { background: var(--bg2); color: var(--text); font-weight: 600; }
+  .btn.danger { background: rgba(229, 72, 77, .14); color: var(--bad); font-weight: 600; }
+  .btn:disabled { opacity: .55; }
+  .lockbox { text-align: center; padding: 28px 6px 10px; }
+  .lockbox .big { font-size: 46px; }
+  .lockbox h2 { margin: 10px 0 6px; font-size: 20px; }
+  .lockbox p { color: var(--hint); margin: 0 0 16px; }
+  .rk { font-family: ui-monospace, Menlo, monospace; font-size: 17px; letter-spacing: .5px; background: var(--bg2); padding: 14px; border-radius: 12px; word-break: break-all; text-align: center; user-select: all; -webkit-user-select: all; border: 1px dashed var(--accent); }
+  .list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); text-align: left; width: 100%; }
+  .item .ic { width: 40px; height: 40px; border-radius: 11px; background: var(--accent-soft); display: grid; place-items: center; font-size: 19px; flex: none; }
+  .item .grow { flex: 1; min-width: 0; }
+  .item .t { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .item .s { font-size: 12px; color: var(--hint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fab { position: fixed; right: 16px; bottom: calc(76px + env(safe-area-inset-bottom)); width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: #111; font-size: 30px; line-height: 1; box-shadow: 0 6px 18px rgba(0,0,0,.35); z-index: 9; }
+  .fld { margin-bottom: 12px; }
+  .fld .lbl { font-size: 12px; color: var(--hint); margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+  .vf { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; background: var(--bg2); border-radius: 12px; margin-bottom: 8px; }
+  .vf .grow { flex: 1; min-width: 0; }
+  .vf .lbl { font-size: 12px; color: var(--hint); }
+  .vf .val { word-break: break-all; white-space: pre-wrap; }
+  .vf .acts { display: flex; gap: 6px; flex: none; }
+  .mini { font-size: 12px; padding: 6px 10px; border-radius: 9px; background: var(--card); white-space: nowrap; }
+  .typegrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .typegrid button { padding: 14px 12px; border-radius: 12px; background: var(--bg2); text-align: left; display: flex; gap: 10px; align-items: center; font-size: 14px; }
+  .typegrid button span { font-size: 20px; }
+  .progress { height: 6px; border-radius: 6px; background: var(--line); overflow: hidden; margin-top: 8px; }
+  .progress b { display: block; height: 100%; background: var(--accent); width: 0; transition: width .2s; }
+  .warn { background: rgba(240, 160, 32, .12); border: 1px solid rgba(240, 160, 32, .35); padding: 10px 12px; border-radius: 12px; font-size: 13px; text-align: left; }
+  .info { background: var(--bg2); padding: 10px 12px; border-radius: 12px; font-size: 13px; color: var(--hint); }
+  .strength { height: 4px; border-radius: 4px; background: var(--line); margin-top: 6px; overflow: hidden; }
+  .strength b { display: block; height: 100%; width: 0; transition: width .2s, background .2s; }
+  .bar2 { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
+  .bar2 .inp { flex: 1; }
+  .preview img, .preview video { width: 100%; border-radius: 12px; max-height: 60vh; object-fit: contain; background: #000; }
+  .preview pre { white-space: pre-wrap; background: var(--bg2); padding: 10px; border-radius: 10px; max-height: 50vh; overflow: auto; }
 </style>
 </head>
 <body>
@@ -116,15 +164,28 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
       </button>
     </div>
+    <div id="chTools" hidden>
     <div class="search">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="q" type="search" placeholder="Arxivdan qidiriş…" autocomplete="off" enterkeyhint="search">
     </div>
     <div class="chips" id="chips"></div>
+    </div>
   </header>
-  <main class="feed" id="feed"></main>
-  <button class="more" id="more" hidden>Yana yuklaş</button>
+  <section id="tabVault"></section>
+  <section id="tabFiles" hidden></section>
+  <section id="tabChannels" hidden>
+    <main class="feed" id="feed"></main>
+    <button class="more" id="more" hidden>Yana yuklaş</button>
+  </section>
 </div>
+<button class="fab" id="fab" hidden aria-label="Qöşiş">+</button>
+<input type="file" id="filePick" multiple hidden>
+<nav class="nav" id="nav">
+  <button data-tab="vault" class="on"><span class="i">🔐</span>Seyf</button>
+  <button data-tab="files"><span class="i">📁</span>Fayllar</button>
+  <button data-tab="channels"><span class="i">📢</span>Kanallar</button>
+</nav>
 
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet"><div class="grab"></div><div id="sheetBody"></div></div>
@@ -451,7 +512,7 @@
 
   // ------------------------------------------------------------ pastki oyna (sheet)
   function openSheet(...children) {
-    $("sheetBody").replaceChildren(...children);
+    $("sheetBody").replaceChildren(...children.flat().filter((c) => c != null && c !== false));
     $("sheetBg").classList.add("open");
     requestAnimationFrame(() => $("sheet").classList.add("open"));
     if (tg && tg.BackButton) { tg.BackButton.show(); tg.BackButton.onClick(closeSheet); }
@@ -499,7 +560,8 @@
         el("div", { class: "grow" }, el("div", { class: "t" }, c.title || "Kanal"), el("div", { class: "s" }, `${STATUS[c.status] || c.status} · ${c.posts_count} ta post`)), btn);
     });
     openSheet(
-      el("h3", null, "Kanallar va tarif"),
+      ...vaultSettings(),
+      el("h3", null, "📢 Kanallar va tarif"),
       ...rows,
       el("div", { class: "row" }, el("div", { class: "grow" },
         el("div", { class: "t" }, me.user.plan === "pro" ? "Pro tarif" : "Bepul tarif"),
@@ -524,6 +586,527 @@
   $("q").addEventListener("keydown", (e) => { if (e.key === "Enter") e.target.blur(); });
   $("more").onclick = () => loadPosts(false);
 
+  // ============================================================ SEYF (telefonda shifrlash)
+  // Kalit tuzilmasi: tasodifiy 256-bit DEK yozuv va fayllarni shifrlaydi. DEK serverga faqat o'ralgan holda boradi:
+  //   wrapped_key          = AES-GCM(KEK = PBKDF2-SHA256(master parol, salt, 600 000), DEK)
+  //   recovery_wrapped_key = AES-GCM(PBKDF2-SHA256(tiklash kaliti, recovery_salt, 600 000), DEK)
+  // Server, admin yoki Supabase ochiq parolni ham, DEK'ni ham ko'rmaydi.
+  const te = new TextEncoder(), td = new TextDecoder();
+  const ITER = 600000;
+  const AUTOLOCK_MS = 5 * 60 * 1000;
+  const CHUNK = 4 * 1024 * 1024;
+  const B64 = {
+    enc(u8) { let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); },
+    dec(s) { const b = atob(s); const u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; },
+  };
+  const rand = (n) => crypto.getRandomValues(new Uint8Array(n));
+  async function kdf(secret, saltB64, iterations) {
+    const base = await crypto.subtle.importKey("raw", te.encode(secret), "PBKDF2", false, ["deriveKey"]);
+    return crypto.subtle.deriveKey({ name: "PBKDF2", hash: "SHA-256", salt: B64.dec(saltB64), iterations }, base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+  }
+  async function seal(key, plain, aad) {
+    const iv = rand(12);
+    const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv, additionalData: te.encode(aad) }, key, plain));
+    const out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12);
+    return out;
+  }
+  async function unseal(key, box, aad) {
+    return new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: box.subarray(0, 12), additionalData: te.encode(aad) }, key, box.subarray(12)));
+  }
+  const importDek = (raw) => crypto.subtle.importKey("raw", raw, { name: "AES-GCM" }, false, ["encrypt", "decrypt"]);
+  const RK_ABC = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  function newRecoveryKey() {
+    let bits = 0, val = 0, out = "";
+    for (const b of rand(20)) { val = ((val << 8) | b) & 0xffff; bits += 8; while (bits >= 5) { out += RK_ABC[(val >>> (bits - 5)) & 31]; bits -= 5; } }
+    return out.match(/.{4}/g).join("-");
+  }
+  const normRK = (s) => String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+
+  const V = { keys: null, dek: null, items: [], filter: "all", q: "", last: Date.now(), hiddenAt: 0 };
+
+  const TYPES = {
+    login: { ic: "🔑", name: "Login va parol", sub: (f) => f.username || f.url || "", fields: [
+      ["title", "Nomi (masalan: Gmail, Instagram)"], ["username", "Login / email / telefon"], ["password", "Parol", "secret gen"],
+      ["url", "Sayt yoki ilova"], ["backup_codes", "2FA zaxira kodlari", "secret multi mono"], ["note", "Izoh", "multi"]] },
+    crypto: { ic: "🪙", name: "Kripto hamyon", sub: (f) => [f.network, f.address].filter(Boolean).join(" · "), fields: [
+      ["title", "Nomi (masalan: Trust Wallet)"], ["network", "Tarmoq / coin (BTC, USDT TRC20…)"], ["address", "Hamyon manzili", "mono"],
+      ["seed", "Seed so'zlar (12 yoki 24 söz)", "secret multi mono"], ["private_key", "Private key", "secret mono"],
+      ["password", "Hamyon paroli / PIN", "secret gen"], ["note", "Izoh", "multi"]] },
+    card: { ic: "💳", name: "Bank karta", sub: (f) => f.number ? "•••• " + String(f.number).replace(/\s/g, "").slice(-4) : "", fields: [
+      ["title", "Nomi (masalan: Humo, Uzcard, Visa)"], ["number", "Karta raqami", "mono"], ["expiry", "Amal qiliş muddati (OO/YY)"],
+      ["holder", "Karta egasi"], ["cvv", "CVV", "secret"], ["pin", "PIN", "secret"], ["note", "Izoh", "multi"]] },
+    document: { ic: "🪪", name: "Hujjat / ID", sub: (f) => f.doc_number || "", fields: [
+      ["title", "Nomi (masalan: Pasport, ID karta)"], ["doc_number", "Raqami / ID", "mono"], ["issued", "Berilgan sana"],
+      ["expires", "Amal qiliş muddati"], ["issuer", "Kim bergan"], ["note", "Izoh", "multi"]] },
+    wifi: { ic: "📶", name: "Wi-Fi", sub: () => "Wi-Fi", fields: [["title", "Tarmoq nomi"], ["password", "Parol", "secret gen"], ["note", "Izoh", "multi"]] },
+    note: { ic: "📝", name: "Maxfiy eslatma", sub: () => "Eslatma", fields: [["title", "Sarlavha"], ["text", "Matn", "secret multi"]] },
+    other: { ic: "🗝", name: "Boşqa narsa", sub: (f) => f.field1 || "", fields: [
+      ["title", "Nomi"], ["field1", "Maydon nomi 1"], ["value1", "Qiymat 1", "secret multi"], ["field2", "Maydon nomi 2"],
+      ["value2", "Qiymat 2", "secret multi"], ["field3", "Maydon nomi 3"], ["value3", "Qiymat 3", "secret multi"], ["note", "Izoh", "multi"]] },
+  };
+
+  function strength(pw) {
+    let s = 0;
+    if (pw.length >= 10) s++; if (pw.length >= 14) s++; if (pw.length >= 18) s++;
+    if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) s++; if (/\d/.test(pw)) s++; if (/[^A-Za-z0-9]/.test(pw)) s++;
+    return Math.min(4, Math.floor(s * 4 / 6));
+  }
+  function genPassword(n = 20) {
+    const abc = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*-_=+?";
+    const out = []; const r = new Uint32Array(n); crypto.getRandomValues(r);
+    for (let i = 0; i < n; i++) out.push(abc[r[i] % abc.length]);
+    return out.join("");
+  }
+  async function copy(text, what) {
+    try { await navigator.clipboard.writeText(text); }
+    catch (_) { const t = el("textarea", { style: "position:fixed;opacity:0" }); t.value = text; document.body.append(t); t.select(); document.execCommand("copy"); t.remove(); }
+    toast((what || "Nusxa") + " olindi");
+    if (tg && tg.HapticFeedback) try { tg.HapticFeedback.notificationOccurred("success"); } catch (_) {}
+  }
+  function pwField(id, placeholder) {
+    const inp = el("input", { class: "inp", id, type: "password", placeholder, autocomplete: "new-password" });
+    const eye = el("button", { class: "mini", type: "button", onclick: () => { inp.type = inp.type === "password" ? "text" : "password"; } }, "👁");
+    return { inp, row: el("div", { class: "bar2" }, inp, eye) };
+  }
+  function busy(btn, text) { btn.disabled = true; btn._t = btn.textContent; btn.textContent = text; return () => { btn.disabled = false; btn.textContent = btn._t; }; }
+
+  // ------------------------------------------------ kalit amallari
+  async function loadKeys() { V.keys = await api("/vault/keys"); return V.keys; }
+
+  async function createVault(password) {
+    const dekRaw = rand(32);
+    const salt = B64.enc(rand(16)), rsalt = B64.enc(rand(16));
+    const rk = newRecoveryKey();
+    const kek = await kdf(password, salt, ITER);
+    const rkek = await kdf(normRK(rk), rsalt, ITER);
+    const body = { iterations: ITER, salt, recovery_salt: rsalt,
+      wrapped_key: B64.enc(await seal(kek, dekRaw, "qq:dek")), recovery_wrapped_key: B64.enc(await seal(rkek, dekRaw, "qq:dek")) };
+    await api("/vault/keys", { method: "POST", body });
+    V.dek = await importDek(dekRaw);
+    dekRaw.fill(0);
+    await loadKeys();
+    return rk;
+  }
+  async function rawDekByPassword(password) {
+    const kek = await kdf(password, V.keys.salt, V.keys.iterations);
+    return await unseal(kek, B64.dec(V.keys.wrapped_key), "qq:dek");
+  }
+  async function rawDekByRecovery(rk) {
+    const rkek = await kdf(normRK(rk), V.keys.recovery_salt, V.keys.iterations);
+    return await unseal(rkek, B64.dec(V.keys.recovery_wrapped_key), "qq:dek");
+  }
+  async function rewrap(dekRaw, { password, rk }) {
+    const body = { replace: true, iterations: ITER,
+      salt: V.keys.salt, wrapped_key: V.keys.wrapped_key, recovery_salt: V.keys.recovery_salt, recovery_wrapped_key: V.keys.recovery_wrapped_key };
+    if (password) { body.salt = B64.enc(rand(16)); body.wrapped_key = B64.enc(await seal(await kdf(password, body.salt, ITER), dekRaw, "qq:dek")); }
+    if (rk) { body.recovery_salt = B64.enc(rand(16)); body.recovery_wrapped_key = B64.enc(await seal(await kdf(normRK(rk), body.recovery_salt, ITER), dekRaw, "qq:dek")); }
+    if (!password) body.iterations = V.keys.iterations;
+    if (password && !rk && V.keys.iterations !== ITER) { /* tiklash qismi eski iteratsiya bilan qoladi */ body.iterations = ITER; }
+    await api("/vault/keys", { method: "POST", body });
+    await loadKeys();
+  }
+  async function unlockWith(dekRaw) {
+    V.dek = await importDek(dekRaw);
+    dekRaw.fill(0);
+    V.last = Date.now();
+    await loadItems();
+  }
+  function lock(silent) {
+    if (!V.dek) return;
+    V.dek = null; V.items = [];
+    closeSheet();
+    renderVault(); if (cur === "files") renderFiles();
+    if (!silent) toast("Seyf qulflandi");
+  }
+  ["pointerdown", "keydown", "scroll"].forEach((ev) => document.addEventListener(ev, () => { V.last = Date.now(); }, { passive: true }));
+  setInterval(() => { if (V.dek && Date.now() - V.last > AUTOLOCK_MS) lock(); }, 15000);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) V.hiddenAt = Date.now();
+    else if (V.dek && V.hiddenAt && Date.now() - V.hiddenAt > 60000) lock();
+  });
+
+  // ------------------------------------------------ yozuvlar
+  async function loadItems() {
+    const r = await api("/vault/items");
+    const out = [];
+    for (const it of r.items) {
+      try {
+        const data = JSON.parse(td.decode(await unseal(V.dek, B64.dec(it.data), "qq:item:" + it.kind)));
+        out.push({ id: it.id, kind: it.kind, f: data.f || {}, updated_at: it.updated_at });
+      } catch (_) { out.push({ id: it.id, kind: it.kind, f: { title: "⚠️ Oçilmadi" }, broken: true, updated_at: it.updated_at }); }
+    }
+    V.items = out;
+    renderVault();
+  }
+  async function saveItem(kind, f, id) {
+    const data = B64.enc(await seal(V.dek, te.encode(JSON.stringify({ v: 1, f })), "qq:item:" + kind));
+    await api("/vault/item", { method: "POST", body: { id: id || undefined, kind, data } });
+    await loadItems();
+  }
+
+  // ------------------------------------------------ seyf ekranlari
+  function renderVault() {
+    const box = $("tabVault");
+    if (cur === "vault") $("fab").hidden = !V.dek;
+    if (!V.keys) { box.replaceChildren(el("div", { class: "skel" })); return; }
+    if (!V.keys.exists) return box.replaceChildren(setupView());
+    if (!V.dek) return box.replaceChildren(unlockView());
+    const q = V.q.toLowerCase();
+    const items = V.items.filter((i) => (V.filter === "all" || i.kind === V.filter) &&
+      (!q || [i.f.title, TYPES[i.kind]?.sub(i.f)].join(" ").toLowerCase().includes(q)));
+    const counts = {}; for (const i of V.items) counts[i.kind] = (counts[i.kind] || 0) + 1;
+    const search = el("input", { class: "inp", type: "search", placeholder: "Seyfdan qidiriş…", value: V.q });
+    search.oninput = () => { V.q = search.value; const pos = search.selectionStart; renderVault(); const n = $("tabVault").querySelector("input"); n.focus(); try { n.setSelectionRange(pos, pos); } catch (_) {} };
+    const chips = el("div", { class: "chips" },
+      el("button", { class: "chip" + (V.filter === "all" ? " on" : ""), onclick: () => { V.filter = "all"; renderVault(); } }, `Barçasi ${V.items.length}`),
+      Object.entries(TYPES).filter(([k]) => counts[k]).map(([k, t]) =>
+        el("button", { class: "chip" + (V.filter === k ? " on" : ""), onclick: () => { V.filter = k; renderVault(); } }, `${t.ic} ${counts[k]}`)));
+    const top = el("div", { class: "bar2", style: "margin-top:4px" }, search,
+      el("button", { class: "icon-btn", "aria-label": "Qulflaş", onclick: () => lock() }, "🔒"));
+    if (!V.items.length) {
+      return box.replaceChildren(top, el("div", { class: "empty" }, el("div", { style: "font-size:40px" }, "🔐"), el("h2", null, "Seyf böş"),
+        el("div", null, "Pastdagi + tugmasi bilan parol, login, kripto hamyon, karta yoki hujjat qöşing. Hammasi telefoningizda şifrlanadi."),
+        el("br"), el("button", { class: "cta", onclick: chooseType }, "+ Birinçi yozuv")));
+    }
+    box.replaceChildren(top, chips, el("div", { class: "list" }, items.map((i) =>
+      el("button", { class: "item", onclick: () => viewItem(i) },
+        el("div", { class: "ic" }, TYPES[i.kind]?.ic || "🗝"),
+        el("div", { class: "grow" }, el("div", { class: "t" }, i.f.title || TYPES[i.kind]?.name), el("div", { class: "s" }, TYPES[i.kind]?.sub(i.f) || TYPES[i.kind]?.name))))),
+      ...(items.length ? [] : [el("div", { class: "empty" }, "Hec narsa topilmadi")]));
+  }
+
+  function setupView() {
+    const p1 = pwField("mp1", "Master parol (kamida 10 belgi)");
+    const p2 = pwField("mp2", "Master parolni takrorlang");
+    const meter = el("b");
+    p1.inp.oninput = () => { const s = strength(p1.inp.value); meter.style.width = (s * 25) + "%"; meter.style.background = ["#e5484d", "#e5484d", "#f0a020", "#35c46a", "#35c46a"][s]; };
+    const btn = el("button", { class: "btn" }, "Seyfni yaratiş");
+    btn.onclick = async () => {
+      const a = p1.inp.value, b = p2.inp.value;
+      if (a.length < 10) return toast("Master parol kamida 10 belgi bölsin");
+      if (strength(a) < 2) return toast("Parol juda oddiy: harf, raqam va belgi aralaştiring");
+      if (a !== b) return toast("Parollar bir xil emas");
+      const done = busy(btn, "Şifrlanmoqda…");
+      try { const rk = await createVault(a); p1.inp.value = p2.inp.value = ""; showRecoveryKey(rk, true); }
+      catch (e) { console.error("vault create", e); done(); toast(e.message === "exists" ? "Seyf allaqaçon yaratilgan" : "Yaratib bölmadi"); }
+    };
+    return el("div", { class: "lockbox" },
+      el("div", { class: "big" }, "🔐"), el("h2", null, "Şaxsiy seyfni yarating"),
+      el("p", null, "Parollar, loginlar, kripto hamyonlar, karta va hujjat ma'lumotlari master parol bilan şu telefonda şifrlanadi. Uni hec kim — hatto Qora Quti ham — oça olmaydi."),
+      el("div", { class: "fld", style: "text-align:left" }, p1.row, el("div", { class: "strength" }, meter)),
+      el("div", { class: "fld", style: "text-align:left" }, p2.row),
+      el("div", { class: "warn" }, "⚠️ Master parolni unutsangiz, uni faqat tiklaş kaliti bilan qaytarasiz. Ikkalasi ham yöqolsa, ma'lumotni hec kim oça olmaydi."),
+      btn);
+  }
+
+  function showRecoveryKey(rk, first) {
+    const ok = el("input", { type: "checkbox", id: "rkok" });
+    const btn = el("button", { class: "btn", disabled: true }, "Davom etiş");
+    ok.onchange = () => { btn.disabled = !ok.checked; };
+    btn.onclick = async () => { closeSheet(); await loadItems(); renderVault(); };
+    openSheet(el("h3", null, "🗝 Tiklaş kalitingiz"),
+      el("div", { class: "info", style: "margin-bottom:12px" }, "Master parolni unutsangiz, seyfni faqat şu kalit bilan oçasiz. Uni qog'ozga yozib, xavfsiz joyda saqlang. Bu kalit boşqa körsatilmaydi."),
+      el("div", { class: "rk" }, rk),
+      el("button", { class: "btn sec", onclick: () => copy(rk, "Tiklaş kaliti") }, "📋 Nusxa oliş"),
+      el("div", { class: "warn", style: "margin-top:12px" }, "Kalitni Telegram çatlariga, galereyaga yoki skrinşotga saqlamang."),
+      el("label", { style: "display:flex;gap:10px;align-items:center;margin-top:14px" }, ok, el("span", null, "Kalitni xavfsiz joyga yozib qöydim")),
+      btn);
+    if (!first) return;
+  }
+
+  function unlockView() {
+    const p = pwField("mpu", "Master parol");
+    const btn = el("button", { class: "btn" }, "Oçiş");
+    const go = async () => {
+      if (!p.inp.value) return;
+      const done = busy(btn, "Tekşirilmoqda…");
+      try { const raw = await rawDekByPassword(p.inp.value); p.inp.value = ""; await unlockWith(raw); }
+      catch (_) { done(); toast("Parol notöğri"); if (tg && tg.HapticFeedback) try { tg.HapticFeedback.notificationOccurred("error"); } catch (_) {} }
+    };
+    btn.onclick = go;
+    p.inp.onkeydown = (e) => { if (e.key === "Enter") go(); };
+    setTimeout(() => p.inp.focus(), 50);
+    return el("div", { class: "lockbox" },
+      el("div", { class: "big" }, "🔒"), el("h2", null, "Seyf qulflangan"),
+      el("p", null, "Oçiş uçun master parolni kiriting."),
+      p.row, btn,
+      el("button", { class: "btn sec", onclick: recoverFlow }, "Parolni unutdim"));
+  }
+
+  function recoverFlow() {
+    const rkIn = el("input", { class: "inp mono", placeholder: "XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX", autocomplete: "off" });
+    const p1 = pwField("rp1", "Yangi master parol"), p2 = pwField("rp2", "Yangi parolni takrorlang");
+    const btn = el("button", { class: "btn" }, "Tiklaş");
+    btn.onclick = async () => {
+      if (p1.inp.value.length < 10 || strength(p1.inp.value) < 2) return toast("Yangi parol kamida 10 belgi va murakkab bölsin");
+      if (p1.inp.value !== p2.inp.value) return toast("Parollar bir xil emas");
+      const done = busy(btn, "Tekşirilmoqda…");
+      let raw;
+      try { raw = await rawDekByRecovery(rkIn.value); } catch (_) { done(); return toast("Tiklaş kaliti notöğri"); }
+      try {
+        await rewrap(raw, { password: p1.inp.value });
+        await unlockWith(raw);
+        closeSheet(); toast("Yangi master parol örnatildi");
+      } catch (_) { done(); toast("Saqlab bölmadi"); }
+    };
+    openSheet(el("h3", null, "Seyfni tiklaş"),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Tiklaş kaliti"), rkIn),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Yangi master parol"), p1.row),
+      el("div", { class: "fld" }, p2.row), btn);
+  }
+
+  function chooseType() {
+    openSheet(el("h3", null, "Nima saqlaymiz?"),
+      el("div", { class: "typegrid" }, Object.entries(TYPES).map(([k, t]) =>
+        el("button", { onclick: () => editItem(k) }, el("span", null, t.ic), t.name))));
+  }
+  $("fab").onclick = () => { if (cur === "vault") chooseType(); else if (cur === "files") $("filePick").click(); };
+
+  function editItem(kind, item) {
+    const t = TYPES[kind];
+    const f = item ? { ...item.f } : {};
+    const inputs = {};
+    const rows = t.fields.map(([key, label, flags = ""]) => {
+      const multi = flags.includes("multi"), secret = flags.includes("secret"), mono = flags.includes("mono");
+      const inp = multi ? el("textarea", { class: "inp" + (mono ? " mono" : ""), rows: 3 }) : el("input", { class: "inp" + (mono ? " mono" : ""), type: secret ? "password" : "text", autocomplete: "off" });
+      inp.value = f[key] || "";
+      inputs[key] = inp;
+      const tools = [];
+      if (secret && !multi) tools.push(el("button", { class: "mini", type: "button", onclick: () => { inp.type = inp.type === "password" ? "text" : "password"; } }, "👁"));
+      if (flags.includes("gen")) tools.push(el("button", { class: "mini", type: "button", onclick: () => { inp.value = genPassword(); inp.type = "text"; } }, "🎲 Yaratiş"));
+      return el("div", { class: "fld" }, el("div", { class: "lbl" }, el("span", null, label), el("span", { style: "display:flex;gap:6px" }, tools)), inp);
+    });
+    const btn = el("button", { class: "btn" }, "Saqlaş");
+    btn.onclick = async () => {
+      const out = {};
+      for (const [k, inp] of Object.entries(inputs)) if (inp.value.trim()) out[k] = inp.value.trim();
+      if (!out.title) return toast("Nomini yozing");
+      const done = busy(btn, "Şifrlanmoqda…");
+      try { await saveItem(kind, out, item && item.id); closeSheet(); toast("Saqlandi 🔐"); }
+      catch (e) { done(); toast(e.message === "limit" ? "Yozuvlar soni limitga yetdi" : "Saqlab bölmadi"); }
+    };
+    openSheet(el("h3", null, `${t.ic} ${item ? "Tahrirlaş" : t.name}`), ...rows, btn,
+      el("div", { class: "note", style: "margin-top:10px;text-align:center" }, "Saqlaşdan oldin şu telefonda şifrlanadi."));
+  }
+
+  function viewItem(item) {
+    const t = TYPES[item.kind] || TYPES.other;
+    const rows = t.fields.filter(([k]) => k !== "title" && item.f[k]).map(([key, label, flags = ""]) => {
+      const secret = flags.includes("secret");
+      let label2 = label;
+      if (item.kind === "other" && /^value\d$/.test(key)) label2 = item.f["field" + key.slice(-1)] || label;
+      if (item.kind === "other" && /^field\d$/.test(key)) return null;
+      const val = el("div", { class: "val" + (flags.includes("mono") ? " mono" : "") }, secret ? "••••••••••" : item.f[key]);
+      const acts = [];
+      if (secret) acts.push(el("button", { class: "mini", onclick: (e) => { const shown = val.textContent !== "••••••••••"; val.textContent = shown ? "••••••••••" : item.f[key]; e.target.textContent = shown ? "👁" : "🙈"; } }, "👁"));
+      acts.push(el("button", { class: "mini", onclick: () => copy(item.f[key], label2) }, "📋"));
+      if (key === "url") acts.push(el("button", { class: "mini", onclick: () => openLink(/^https?:/i.test(item.f.url) ? item.f.url : "https://" + item.f.url) }, "↗"));
+      return el("div", { class: "vf" }, el("div", { class: "grow" }, el("div", { class: "lbl" }, label2), val), el("div", { class: "acts" }, acts));
+    });
+    const del = el("button", { class: "btn danger" }, "🗑 Öçiriş");
+    del.onclick = async () => {
+      if (del.dataset.sure !== "1") { del.dataset.sure = "1"; del.textContent = "Rostdan öçirilsinmi? Yana bir bosing"; return; }
+      try { await api("/vault/item_delete", { method: "POST", body: { id: item.id } }); closeSheet(); await loadItems(); toast("Öçirildi"); }
+      catch (_) { toast("Öçirib bölmadi"); }
+    };
+    openSheet(el("h3", null, `${t.ic} ${item.f.title || t.name}`),
+      el("div", { class: "note", style: "margin:-6px 0 12px" }, `${t.name} · yangilangan ${fmtDate(item.updated_at)}`),
+      ...rows.filter(Boolean),
+      item.broken ? el("div", { class: "warn" }, "Bu yozuvni oçib bölmadi.") : el("button", { class: "btn sec", onclick: () => editItem(item.kind, item) }, "✏️ Tahrirlaş"),
+      del);
+  }
+
+  function vaultSettings() {
+    if (!V.keys || !V.keys.exists) return [];
+    const change = el("button", { class: "btn sec" }, "🔑 Master parolni özgartiriş");
+    change.onclick = () => {
+      const o = pwField("cp0", "Hozirgi master parol"), n1 = pwField("cp1", "Yangi master parol"), n2 = pwField("cp2", "Yangi parolni takrorlang");
+      const b = el("button", { class: "btn" }, "Özgartiriş");
+      b.onclick = async () => {
+        if (n1.inp.value.length < 10 || strength(n1.inp.value) < 2) return toast("Yangi parol kamida 10 belgi va murakkab bölsin");
+        if (n1.inp.value !== n2.inp.value) return toast("Parollar bir xil emas");
+        const done = busy(b, "Şifrlanmoqda…");
+        let raw; try { raw = await rawDekByPassword(o.inp.value); } catch (_) { done(); return toast("Hozirgi parol notöğri"); }
+        try { await rewrap(raw, { password: n1.inp.value }); raw.fill(0); closeSheet(); toast("Master parol özgartirildi"); }
+        catch (_) { done(); toast("Saqlab bölmadi"); }
+      };
+      openSheet(el("h3", null, "Master parolni özgartiriş"), el("div", { class: "fld" }, o.row), el("div", { class: "fld" }, n1.row), el("div", { class: "fld" }, n2.row), b);
+    };
+    const newRk = el("button", { class: "btn sec" }, "🗝 Yangi tiklaş kaliti");
+    newRk.onclick = () => {
+      const o = pwField("nk0", "Master parol");
+      const b = el("button", { class: "btn" }, "Yangi kalit yaratiş");
+      b.onclick = async () => {
+        const done = busy(b, "Şifrlanmoqda…");
+        let raw; try { raw = await rawDekByPassword(o.inp.value); } catch (_) { done(); return toast("Parol notöğri"); }
+        try { const rk = newRecoveryKey(); await rewrap(raw, { rk }); raw.fill(0); showRecoveryKey(rk, false); }
+        catch (_) { done(); toast("Saqlab bölmadi"); }
+      };
+      openSheet(el("h3", null, "Yangi tiklaş kaliti"), el("div", { class: "info", style: "margin-bottom:12px" }, "Eski tiklaş kaliti işlamay qoladi."), el("div", { class: "fld" }, o.row), b);
+    };
+    return [el("h3", { style: "margin-top:6px" }, "🔐 Seyf"),
+      el("div", { class: "note", style: "margin-bottom:6px" }, `Avto-qulf: 5 daqiqa harakatsizlikdan keyin.`),
+      change, newRk, V.dek ? el("button", { class: "btn sec", onclick: () => lock() }, "🔒 Hozir qulflaş") : null,
+      el("div", { style: "height:18px" })];
+  }
+
+  // ============================================================ FAYLLAR
+  const F = { list: null, metas: new Map(), uploading: [] };
+  async function loadFiles() {
+    const r = await api("/files");
+    F.list = r.files;
+    if (V.dek) for (const f of F.list) if (f.encrypted && !F.metas.has(f.id)) {
+      try { F.metas.set(f.id, JSON.parse(td.decode(await unseal(V.dek, B64.dec(f.enc_meta), "qq:meta")))); } catch (_) {}
+    }
+    renderFiles();
+  }
+  const FKIND = { photo: "🖼", video: "🎬", animation: "🎞", audio: "🎵", voice: "🎙", video_note: "⭕️", document: "📄", file: "🔒" };
+  function fileName(f) {
+    if (f.encrypted) { const m = F.metas.get(f.id); return m ? m.name : "🔒 Şifrlangan fayl"; }
+    return f.file_name || ({ photo: "Rasm", video: "Video", animation: "GIF", audio: "Audio", voice: "Ovozli xabar", video_note: "Video xabar" }[f.kind] || "Fayl") + " #" + f.id;
+  }
+  function fileSub(f) {
+    const st = { tg_only: "Telegram bulutida", pending: "nusxasi yozilmoqda…", stored: "Telegram + zaxira nusxa", failed: "nusxa olinmadi", ready: "şifrlangan" }[f.status] || f.status;
+    return [f.size ? fmtBytes(f.size) : null, fmtDate(f.created_at), st].filter(Boolean).join(" · ");
+  }
+  function renderFiles() {
+    const box = $("tabFiles");
+    if (cur === "files") $("fab").hidden = false;
+    if (!F.list) { box.replaceChildren(el("div", { class: "skel" }), el("div", { class: "skel" })); return; }
+    const up = F.uploading.map((u) => el("div", { class: "item" }, el("div", { class: "ic" }, "⬆️"),
+      el("div", { class: "grow" }, el("div", { class: "t" }, u.name), el("div", { class: "s" }, u.err ? "Xato: " + u.err : `Şifrlanib yuklanmoqda… ${Math.round(u.p * 100)}%`),
+        el("div", { class: "progress" }, el("b", { style: `width:${Math.round(u.p * 100)}%` })))));
+    const head = el("div", { class: "info", style: "margin-top:4px" },
+      "📤 Istalgan hajmdagi faylni bot çatiga yuboring — u şu yerda paydo böladi. 🔒 Maxfiy hujjatlarni pastdagi + tugmasi bilan yuklang: ular master parol bilan şifrlanadi.",
+      V.dek ? null : el("div", { style: "margin-top:6px" }, "Şifrlangan fayllar nomini körish uçun Seyf'ni oçing."));
+    if (!F.list.length && !up.length) {
+      return box.replaceChildren(head, el("div", { class: "empty" }, el("div", { style: "font-size:40px" }, "📁"), el("h2", null, "Hali fayl yöq"),
+        el("div", null, "Rasm, video, hujjat — istalgan faylni botga yuboring.")));
+    }
+    box.replaceChildren(head, el("div", { class: "list" }, up, F.list.map((f) =>
+      el("button", { class: "item", onclick: () => fileActions(f) },
+        el("div", { class: "ic" }, f.encrypted ? "🔒" : (FKIND[f.kind] || "📄")),
+        el("div", { class: "grow" }, el("div", { class: "t" }, fileName(f)), el("div", { class: "s" }, fileSub(f)))))));
+  }
+
+  function fileActions(f) {
+    const acts = [];
+    if (!f.encrypted) {
+      const send = el("button", { class: "btn" }, "📤 Telegramga yuboriş");
+      send.onclick = async () => { const done = busy(send, "Yuborilmoqda…"); try { await api("/files/send", { method: "POST", body: { id: f.id } }); toast("Bot çatiga yuborildi"); closeSheet(); } catch (_) { toast("Yuborib bölmadi"); } done(); };
+      acts.push(send);
+      if (f.status === "stored") acts.push(el("button", { class: "btn sec", onclick: async () => {
+        try { const r = await api(`/files/download?id=${f.id}&download=1`); if (tg && tg.downloadFile && tg.isVersionAtLeast && tg.isVersionAtLeast("8.0")) tg.downloadFile({ url: r.url, file_name: fileName(f) }); else openLink(r.url); }
+        catch (_) { toast("Yuklab bölmadi"); } } }, "⬇️ Zaxira nusxani yuklaş"));
+    } else {
+      if (!V.dek) acts.push(el("button", { class: "btn", onclick: () => { closeSheet(); switchTab("vault"); toast("Avval Seyf'ni oçing"); } }, "🔐 Seyf'ni oçiş"));
+      else {
+        const open = el("button", { class: "btn" }, "👁 Oçiş");
+        open.onclick = async () => {
+          const done = busy(open, "Şifr oçilmoqda…");
+          try { const blob = await decryptFile(f, (p) => { open.textContent = `Şifr oçilmoqda… ${Math.round(p * 100)}%`; }); done(); previewBlob(f, blob); }
+          catch (_) { done(); toast("Oçib bölmadi"); }
+        };
+        acts.push(open);
+      }
+    }
+    const del = el("button", { class: "btn danger" }, "🗑 Öçiriş");
+    del.onclick = async () => {
+      if (del.dataset.sure !== "1") { del.dataset.sure = "1"; del.textContent = "Rostdan öçirilsinmi? Yana bir bosing"; return; }
+      try { await api("/files/delete", { method: "POST", body: { id: f.id } }); closeSheet(); await loadFiles(); toast("Öçirildi"); } catch (_) { toast("Öçirib bölmadi"); }
+    };
+    acts.push(del);
+    openSheet(el("h3", null, fileName(f)), el("div", { class: "note", style: "margin:-6px 0 12px" }, fileSub(f)),
+      f.caption ? el("div", { class: "info", style: "margin-bottom:8px" }, f.caption) : null, ...acts);
+  }
+
+  async function decryptFile(f, onp) {
+    const meta = F.metas.get(f.id) || {};
+    const parts = [];
+    for (let i = 0; i < f.chunks; i++) {
+      const r = await api(`/files/chunk_url?id=${f.id}&i=${i}&mode=get`);
+      const res = await fetch(r.url);
+      if (!res.ok) throw new Error("download");
+      parts.push(await unseal(V.dek, new Uint8Array(await res.arrayBuffer()), `qq:file:${f.id}:${i}:${f.chunks}`));
+      onp && onp((i + 1) / f.chunks);
+    }
+    return new Blob(parts, { type: meta.mime || "application/octet-stream" });
+  }
+  function previewBlob(f, blob) {
+    const meta = F.metas.get(f.id) || {};
+    const url = URL.createObjectURL(blob);
+    let view = null;
+    if (/^image\//.test(blob.type)) view = el("img", { src: url });
+    else if (/^video\//.test(blob.type)) view = el("video", { src: url, controls: true, playsinline: true });
+    else if (/^audio\//.test(blob.type)) view = el("audio", { src: url, controls: true, style: "width:100%" });
+    else if (/^text\/|json/.test(blob.type) && blob.size < 2e6) { view = el("pre"); blob.text().then((t) => { view.textContent = t; }); }
+    const save = el("a", { class: "btn sec", href: url, download: meta.name || "fayl" }, "⬇️ Qurilmaga saqlaş");
+    openSheet(el("h3", null, meta.name || "Fayl"), el("div", { class: "preview" }, view || el("div", { class: "info" }, "Bu fayl turini şu yerda körsatib bölmaydi. Qurilmaga saqlang.")), save);
+  }
+
+  $("filePick").onchange = async (e) => {
+    const files = [...e.target.files];
+    e.target.value = "";
+    if (!V.dek) { switchTab("vault"); return toast("Şifrlab yuklaş uçun avval Seyf'ni oçing"); }
+    for (const file of files) await uploadEncrypted(file);
+  };
+  async function uploadEncrypted(file) {
+    const u = { name: file.name, p: 0 };
+    F.uploading.push(u); renderFiles();
+    try {
+      const chunks = Math.max(1, Math.ceil(file.size / CHUNK));
+      if (file.size === 0) throw new Error("böş fayl");
+      const meta = { name: file.name, mime: file.type || "application/octet-stream", size: file.size };
+      const encMeta = B64.enc(await seal(V.dek, te.encode(JSON.stringify(meta)), "qq:meta"));
+      let init;
+      try { init = await api("/files/upload_init", { method: "POST", body: { size: file.size, chunks, chunk_size: CHUNK, enc_meta: encMeta } }); }
+      catch (err) { throw new Error(err.message === "quota" ? "joy yetmaydi" : err.message); }
+      const id = init.id;
+      F.metas.set(id, meta);
+      let next = 0, done = 0;
+      const worker = async () => {
+        while (next < chunks) {
+          const i = next++;
+          const plain = new Uint8Array(await file.slice(i * CHUNK, Math.min(file.size, (i + 1) * CHUNK)).arrayBuffer());
+          const box = await seal(V.dek, plain, `qq:file:${id}:${i}:${chunks}`);
+          const r = await api(`/files/chunk_url?id=${id}&i=${i}`);
+          const put = await fetch(r.url, { method: "PUT", headers: { "Content-Type": "application/octet-stream", "x-upsert": "true" }, body: box });
+          if (!put.ok) throw new Error("yuklaş " + put.status);
+          done++; u.p = done / chunks; renderFiles();
+        }
+      };
+      await Promise.all([worker(), worker()]);
+      await api("/files/upload_done", { method: "POST", body: { id } });
+      F.uploading = F.uploading.filter((x) => x !== u);
+      toast("🔒 Şifrlab saqlandi");
+      await loadFiles();
+      loadMe().catch(() => {});
+    } catch (err) {
+      u.err = err.message || "xato"; renderFiles();
+      setTimeout(() => { F.uploading = F.uploading.filter((x) => x !== u); renderFiles(); }, 6000);
+    }
+  }
+
+  // ============================================================ TABLAR
+  let cur = "vault";
+  let channelsLoaded = false;
+  function switchTab(t) {
+    cur = t;
+    for (const b of $("nav").querySelectorAll("button")) b.classList.toggle("on", b.dataset.tab === t);
+    $("tabVault").hidden = t !== "vault";
+    $("tabFiles").hidden = t !== "files";
+    $("tabChannels").hidden = t !== "channels";
+    $("chTools").hidden = t !== "channels";
+    $("fab").hidden = !((t === "vault" && V.dek) || t === "files");
+    $("fab").textContent = t === "files" ? "⬆" : "+";
+    try { localStorage.setItem("qq_tab", t); } catch (_) {}
+    if (t === "vault") renderVault();
+    if (t === "files") { renderFiles(); loadFiles().catch(() => toast("Fayllarni yuklab bölmadi")); }
+    if (t === "channels" && !channelsLoaded) { channelsLoaded = true; loadPosts(true); }
+    window.scrollTo(0, 0);
+  }
+  for (const b of $("nav").querySelectorAll("button")) b.onclick = () => switchTab(b.dataset.tab);
+
   // ------------------------------------------------------------ boshlash
   async function loadMe() {
     state.me = await api("/me");
@@ -532,23 +1115,25 @@
 
   async function boot() {
     if (!initData) {
-      $("feed").replaceChildren(el("div", { class: "empty" }, el("div", { style: "font-size:40px" }, "🔒"), el("h2", null, "Telegram ichida oçing"),
-        el("div", null, "Qora Quti arxivi faqat Telegram'dagi bot orqali oçiladi.")));
-      $("q").disabled = true;
+      $("tabVault").replaceChildren(el("div", { class: "empty" }, el("div", { style: "font-size:40px" }, "🔒"), el("h2", null, "Telegram ichida oçing"),
+        el("div", null, "Qora Quti faqat Telegram'dagi @qora_quti_bot orqali oçiladi.")));
+      $("nav").hidden = true;
       return;
     }
-    $("feed").replaceChildren(el("div", { class: "skel" }), el("div", { class: "skel" }));
+    $("tabVault").replaceChildren(el("div", { class: "skel" }), el("div", { class: "skel" }));
     try {
-      await loadMe();
+      await Promise.all([loadMe(), loadKeys()]);
     } catch (e) {
-      $("feed").replaceChildren(el("div", { class: "empty" }, el("h2", null, e.status === 401 ? "Kiriş tasdiqlanmadi" : "Ulanib bölmadi"),
+      $("tabVault").replaceChildren(el("div", { class: "empty" }, el("h2", null, e.status === 401 ? "Kiriş tasdiqlanmadi" : "Ulanib bölmadi"),
         el("div", null, e.status === 401 ? "Mini App'ni bot menyusidan qayta oçing." : "Birozdan keyin qayta urinib köring."),
         el("br"), el("button", { class: "cta", onclick: boot }, "Qayta urinish")));
       return;
     }
     if (state.me.channels.length === 1) state.channel = state.me.channels[0].id;
     renderHeader();
-    await loadPosts(true);
+    let t = "vault";
+    try { t = localStorage.getItem("qq_tab") || "vault"; } catch (_) {}
+    switchTab(["vault", "files", "channels"].includes(t) ? t : "vault");
   }
   boot();
 })();
