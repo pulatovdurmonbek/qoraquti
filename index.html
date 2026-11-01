@@ -190,6 +190,7 @@
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet"><div class="grab"></div><div id="sheetBody"></div></div>
 <div class="toast" id="toast"></div>
+<div id="shield" hidden style="position:fixed;inset:0;z-index:50;background:var(--bg);display:grid;place-items:center;font-size:48px">🔒</div>
 
 <script>
 (() => {
@@ -621,6 +622,17 @@
     return out.match(/.{4}/g).join("-");
   }
   const normRK = (s) => String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const toHex = (u8) => [...u8].map((b) => b.toString(16).padStart(2, "0")).join("");
+  // Akkaunt yo'qolsa ko'chirish uchun: tiklash kalitidan alohida "ko'chirish tokeni" chiqariladi.
+  // Server faqat uning SHA-256 xeshini saqlaydi; token faqat tiklash paytida yuboriladi.
+  async function transferToken(rk) {
+    const base = await crypto.subtle.importKey("raw", te.encode(normRK(rk)), "PBKDF2", false, ["deriveBits"]);
+    const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: te.encode("qq-transfer-v1"), iterations: 100000 }, base, 256);
+    return toHex(new Uint8Array(bits));
+  }
+  async function transferHash(rk) {
+    return toHex(new Uint8Array(await crypto.subtle.digest("SHA-256", te.encode(await transferToken(rk)))));
+  }
 
   const V = { keys: null, dek: null, items: [], filter: "all", q: "", last: Date.now(), hiddenAt: 0 };
 
@@ -660,7 +672,9 @@
   async function copy(text, what) {
     try { await navigator.clipboard.writeText(text); }
     catch (_) { const t = el("textarea", { style: "position:fixed;opacity:0" }); t.value = text; document.body.append(t); t.select(); document.execCommand("copy"); t.remove(); }
-    toast((what || "Nusxa") + " olindi");
+    toast((what || "Nusxa") + " olindi · 30 soniyadan keyin tozalanadi");
+    clearTimeout(copy._t);
+    copy._t = setTimeout(() => { try { navigator.clipboard.writeText(""); } catch (_) {} }, 30000);
     if (tg && tg.HapticFeedback) try { tg.HapticFeedback.notificationOccurred("success"); } catch (_) {}
   }
   function pwField(id, placeholder) {
@@ -680,7 +694,8 @@
     const kek = await kdf(password, salt, ITER);
     const rkek = await kdf(normRK(rk), rsalt, ITER);
     const body = { iterations: ITER, salt, recovery_salt: rsalt,
-      wrapped_key: B64.enc(await seal(kek, dekRaw, "qq:dek")), recovery_wrapped_key: B64.enc(await seal(rkek, dekRaw, "qq:dek")) };
+      wrapped_key: B64.enc(await seal(kek, dekRaw, "qq:dek")), recovery_wrapped_key: B64.enc(await seal(rkek, dekRaw, "qq:dek")),
+      transfer_hash: await transferHash(rk) };
     await api("/vault/keys", { method: "POST", body });
     V.dek = await importDek(dekRaw);
     dekRaw.fill(0);
@@ -699,7 +714,11 @@
     const body = { replace: true, iterations: ITER,
       salt: V.keys.salt, wrapped_key: V.keys.wrapped_key, recovery_salt: V.keys.recovery_salt, recovery_wrapped_key: V.keys.recovery_wrapped_key };
     if (password) { body.salt = B64.enc(rand(16)); body.wrapped_key = B64.enc(await seal(await kdf(password, body.salt, ITER), dekRaw, "qq:dek")); }
-    if (rk) { body.recovery_salt = B64.enc(rand(16)); body.recovery_wrapped_key = B64.enc(await seal(await kdf(normRK(rk), body.recovery_salt, ITER), dekRaw, "qq:dek")); }
+    if (rk) {
+      body.recovery_salt = B64.enc(rand(16));
+      body.recovery_wrapped_key = B64.enc(await seal(await kdf(normRK(rk), body.recovery_salt, ITER), dekRaw, "qq:dek"));
+      body.transfer_hash = await transferHash(rk);
+    }
     if (!password) body.iterations = V.keys.iterations;
     if (password && !rk && V.keys.iterations !== ITER) { /* tiklash qismi eski iteratsiya bilan qoladi */ body.iterations = ITER; }
     await api("/vault/keys", { method: "POST", body });
@@ -720,7 +739,13 @@
   }
   ["pointerdown", "keydown", "scroll"].forEach((ev) => document.addEventListener(ev, () => { V.last = Date.now(); }, { passive: true }));
   setInterval(() => { if (V.dek && Date.now() - V.last > AUTOLOCK_MS) lock(); }, 15000);
+  // Ilovalar ro'yxatidagi kichik rasmda (app switcher) seyf ko'rinmasin
+  const shield = (on) => { const sh = $("shield"); if (sh) sh.hidden = !on; };
+  window.addEventListener("blur", () => { if (V.dek) shield(true); });
+  window.addEventListener("focus", () => shield(false));
+  window.addEventListener("pagehide", () => shield(true));
   document.addEventListener("visibilitychange", () => {
+    shield(document.hidden && !!V.dek);
     if (document.hidden) V.hiddenAt = Date.now();
     else if (V.dek && V.hiddenAt && Date.now() - V.hiddenAt > 60000) lock();
   });
@@ -749,7 +774,7 @@
     const box = $("tabVault");
     if (cur === "vault") $("fab").hidden = !V.dek;
     if (!V.keys) { box.replaceChildren(el("div", { class: "skel" })); return; }
-    if (!V.keys.exists) return box.replaceChildren(setupView());
+    if (!V.keys.exists) return box.replaceChildren(V.transfer && V.transfer.pending ? waitingView() : setupView());
     if (!V.dek) return box.replaceChildren(unlockView());
     const q = V.q.toLowerCase();
     const items = V.items.filter((i) => (V.filter === "all" || i.kind === V.filter) &&
@@ -761,8 +786,10 @@
       el("button", { class: "chip" + (V.filter === "all" ? " on" : ""), onclick: () => { V.filter = "all"; renderVault(); } }, `Barçasi ${V.items.length}`),
       Object.entries(TYPES).filter(([k]) => counts[k]).map(([k, t]) =>
         el("button", { class: "chip" + (V.filter === k ? " on" : ""), onclick: () => { V.filter = k; renderVault(); } }, `${t.ic} ${counts[k]}`)));
-    const top = el("div", { class: "bar2", style: "margin-top:4px" }, search,
-      el("button", { class: "icon-btn", "aria-label": "Qulflaş", onclick: () => lock() }, "🔒"));
+    const top = el("div", null, el("div", { class: "bar2", style: "margin-top:4px" }, search,
+      el("button", { class: "icon-btn", "aria-label": "Qulflaş", onclick: () => lock() }, "🔒")),
+      V.keys.has_transfer ? null : el("div", { class: "warn", style: "margin-top:10px" },
+        "⚠️ Telegram akkauntingiz yöqolsa seyfni köçiriş uçun yangi tiklaş kaliti yarating: ⚙️ → Yangi tiklaş kaliti."));
     if (!V.items.length) {
       return box.replaceChildren(top, el("div", { class: "empty" }, el("div", { style: "font-size:40px" }, "🔐"), el("h2", null, "Seyf böş"),
         el("div", null, "Pastdagi + tugmasi bilan parol, login, kripto hamyon, karta yoki hujjat qöşing. Hammasi telefoningizda şifrlanadi."),
@@ -796,7 +823,9 @@
       el("div", { class: "fld", style: "text-align:left" }, p1.row, el("div", { class: "strength" }, meter)),
       el("div", { class: "fld", style: "text-align:left" }, p2.row),
       el("div", { class: "warn" }, "⚠️ Master parolni unutsangiz, uni faqat tiklaş kaliti bilan qaytarasiz. Ikkalasi ham yöqolsa, ma'lumotni hec kim oça olmaydi."),
-      btn);
+      btn,
+      el("div", { class: "note", style: "margin:22px 0 4px" }, "Avval boşqa Telegram akkauntda seyfingiz bor edimi?"),
+      el("button", { class: "btn sec", onclick: transferFlow }, "♻️ Eski seyfimni tiklaş"));
   }
 
   function showRecoveryKey(rk, first) {
@@ -855,6 +884,37 @@
       el("div", { class: "fld" }, p2.row), btn);
   }
 
+  function transferFlow() {
+    const rkIn = el("input", { class: "inp mono", placeholder: "XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX", autocomplete: "off" });
+    const btn = el("button", { class: "btn" }, "Tiklaş so'rovini yuboriş");
+    btn.onclick = async () => {
+      if (normRK(rkIn.value).length !== 32) return toast("Tiklaş kaliti 32 belgidan iborat");
+      const done = busy(btn, "Tekşirilmoqda…");
+      try {
+        const r = await api("/recovery/request", { method: "POST", body: { token: await transferToken(rkIn.value) } });
+        rkIn.value = "";
+        closeSheet();
+        V.transfer = { pending: true, ready_at: r.ready_at };
+        renderVault();
+      } catch (e) {
+        done();
+        toast({ wrong: "Tiklaş kaliti notöğri", rate: "Juda köp urinish. Keyinroq qayta urinib köring", has_vault: "Bu akkauntda boşqa seyf bor", same: "Bu seyf şu akkauntning özida" }[e.message] || "Yuborib bölmadi");
+      }
+    };
+    openSheet(el("h3", null, "♻️ Seyfni yangi akkauntga köçiriş"),
+      el("div", { class: "info", style: "margin-bottom:12px" },
+        "Eski Telegram akkauntingiz yoki telefoningiz yöqolgan bölsa, seyfni şu akkauntga köçirasiz. Buning uçun seyf yaratilganda berilgan tiklaş kaliti kerak. Xavfsizlik uçun köçiriş 24 soatdan keyin bajariladi; şu vaqt ichida eski akkauntga ogohlantiriş boradi."),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Tiklaş kaliti"), rkIn), btn);
+  }
+
+  function waitingView() {
+    const t = new Date(V.transfer.ready_at);
+    return el("div", { class: "lockbox" },
+      el("div", { class: "big" }, "⏳"), el("h2", null, "Köçiriş kutilmoqda"),
+      el("p", null, `Seyfingiz ${fmtDate(t.toISOString())} da şu akkauntga köçadi. Bot sizga xabar beradi.`),
+      el("div", { class: "info" }, "Köçgandan keyin seyfni eski master parol yoki tiklaş kaliti bilan oçasiz."));
+  }
+
   function chooseType() {
     openSheet(el("h3", null, "Nima saqlaymiz?"),
       el("div", { class: "typegrid" }, Object.entries(TYPES).map(([k, t]) =>
@@ -898,7 +958,12 @@
       if (item.kind === "other" && /^field\d$/.test(key)) return null;
       const val = el("div", { class: "val" + (flags.includes("mono") ? " mono" : "") }, secret ? "••••••••••" : item.f[key]);
       const acts = [];
-      if (secret) acts.push(el("button", { class: "mini", onclick: (e) => { const shown = val.textContent !== "••••••••••"; val.textContent = shown ? "••••••••••" : item.f[key]; e.target.textContent = shown ? "👁" : "🙈"; } }, "👁"));
+      if (secret) acts.push(el("button", { class: "mini", onclick: (e) => {
+        const b = e.currentTarget, shown = val.textContent !== "••••••••••";
+        val.textContent = shown ? "••••••••••" : item.f[key]; b.textContent = shown ? "👁" : "🙈";
+        clearTimeout(val._t);
+        if (!shown) val._t = setTimeout(() => { val.textContent = "••••••••••"; b.textContent = "👁"; }, 20000);
+      } }, "👁"));
       acts.push(el("button", { class: "mini", onclick: () => copy(item.f[key], label2) }, "📋"));
       if (key === "url") acts.push(el("button", { class: "mini", onclick: () => openLink(/^https?:/i.test(item.f.url) ? item.f.url : "https://" + item.f.url) }, "↗"));
       return el("div", { class: "vf" }, el("div", { class: "grow" }, el("div", { class: "lbl" }, label2), val), el("div", { class: "acts" }, acts));
@@ -944,7 +1009,17 @@
       };
       openSheet(el("h3", null, "Yangi tiklaş kaliti"), el("div", { class: "info", style: "margin-bottom:12px" }, "Eski tiklaş kaliti işlamay qoladi."), el("div", { class: "fld" }, o.row), b);
     };
+    const prot = el("input", { type: "checkbox" });
+    prot.checked = state.me.user.protect !== false;
+    prot.onchange = async () => {
+      try { await api("/settings", { method: "POST", body: { protect: prot.checked } }); state.me.user.protect = prot.checked;
+        toast(prot.checked ? "Himoya yoqildi" : "Himoya öçirildi"); }
+      catch (_) { prot.checked = !prot.checked; toast("Saqlab bölmadi"); }
+    };
     return [el("h3", { style: "margin-top:6px" }, "🔐 Seyf"),
+      el("label", { class: "vf", style: "align-items:center" }, el("div", { class: "grow" },
+        el("div", null, "Himoyalangan rejim"),
+        el("div", { class: "lbl" }, "Bot yuborgan xabar va fayllarni forward qiliş, saqlaş va telefonda skrinşot oliş taqiqlanadi")), prot),
       el("div", { class: "note", style: "margin-bottom:6px" }, `Avto-qulf: 5 daqiqa harakatsizlikdan keyin.`),
       change, newRk, V.dek ? el("button", { class: "btn sec", onclick: () => lock() }, "🔒 Hozir qulflaş") : null,
       el("div", { style: "height:18px" })];
@@ -1123,6 +1198,7 @@
     $("tabVault").replaceChildren(el("div", { class: "skel" }), el("div", { class: "skel" }));
     try {
       await Promise.all([loadMe(), loadKeys()]);
+      if (!V.keys.exists) { try { V.transfer = await api("/recovery/status"); } catch (_) {} }
     } catch (e) {
       $("tabVault").replaceChildren(el("div", { class: "empty" }, el("h2", null, e.status === 401 ? "Kiriş tasdiqlanmadi" : "Ulanib bölmadi"),
         el("div", null, e.status === 401 ? "Mini App'ni bot menyusidan qayta oçing." : "Birozdan keyin qayta urinib köring."),
