@@ -150,6 +150,13 @@
   .bar2 { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
   .bar2 .inp { flex: 1; }
   .preview img, .preview video { width: 100%; border-radius: 12px; max-height: 60vh; object-fit: contain; background: #000; }
+  .cam { position: relative; border-radius: 16px; overflow: hidden; background: #000; aspect-ratio: 3/4; max-height: 52vh; margin: 0 auto 10px; }
+  .cam video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; }
+  .cam .ring { position: absolute; inset: 12% 18%; border: 3px dashed rgba(255,255,255,.55); border-radius: 50%; transition: border-color .2s; }
+  .cam .ring.ok { border-color: var(--ok); border-style: solid; }
+  .steps { display: flex; gap: 6px; justify-content: center; margin: 6px 0 10px; }
+  .steps i { width: 26px; height: 6px; border-radius: 6px; background: var(--line); }
+  .steps i.on { background: var(--ok); }
   .preview pre { white-space: pre-wrap; background: var(--bg2); padding: 10px; border-radius: 10px; max-height: 50vh; overflow: auto; }
 </style>
 </head>
@@ -202,6 +209,80 @@
   const STATUS = { active: "yozilmoqda", paused: "töxtatilgan", over_quota: "limitdan taşqari", bot_removed: "bot olib taşlangan" };
 
   const state = { me: null, channel: null, q: "", next: null, loading: false, posts: [] };
+  // ============================================================ TIL (o'zbek / rus / ingliz)
+  // Butun ilova o'zbekcha yozilgan; ekranga chiqadigan har bir matn shu lug'at bo'yicha avtomatik tarjima qilinadi
+  // (MutationObserver): to'liq mos kelish → andozalar ({1}) → " · " bo'yicha qismlar → boshi/oxiridagi belgi va sonlarsiz.
+  const LANGS = ["uz", "ru", "en"];
+  const LANG = (() => {
+    try { const v = localStorage.getItem("qq_lang"); if (LANGS.includes(v)) return v; } catch (_) {}
+    const lc = String((tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.language_code) || "uz").toLowerCase();
+    if (lc.startsWith("uz")) return "uz";
+    if (/^(ru|uk|be|kk|ky|tg)/.test(lc)) return "ru";
+    return "en";
+  })();
+  document.documentElement.lang = LANG;
+  const I18N = {"D": {"töxtatilgan": ["приостановлен", "paused"], "limitdan taşqari": ["сверх лимита", "over limit"], "bot olib taşlangan": ["бот удалён", "bot removed"], "Arxivga yuklanmoqda…": ["Загружается в архив…", "Uploading to archive…"], "20 MB dan katta — hozirça faqat Telegramda": ["Больше 20 МБ — пока только в Telegram", "Over 20 MB — only in Telegram for now"], "Media limiti tögan": ["Лимит медиа исчерпан", "Media limit reached"], "Saqlab bölmadi": ["Не удалось сохранить", "Couldn't save"], "Telegramda oçiş": ["Открыть в Telegram", "Open in Telegram"], "Rasm oçilmadi": ["Не удалось открыть фото", "Couldn't open photo"], "▶ Körish": ["▶ Смотреть", "▶ Watch"], "Video oçilmadi": ["Не удалось открыть видео", "Couldn't open video"], "Ovozli xabar": ["Голосовое сообщение", "Voice message"], "Audio oçilmadi": ["Не удалось открыть аудио", "Couldn't open audio"], "Fayl": ["Файл", "File"], "Yuklaş": ["Скачать", "Download"], "Fayl oçilmadi": ["Не удалось открыть файл", "Couldn't open file"], "Kanal": ["Канал", "Channel"], "Telegramda oçiş ↗": ["Открыть в Telegram ↗", "Open in Telegram ↗"], "Hali kanal ulanmagan": ["Канал ещё не подключён", "No channel connected yet"], "Pastdagi tugmani bosing va kanalingizni tanlang.": ["Нажмите кнопку ниже и выберите свой канал.", "Tap the button below and choose your channel."], "Botni admin qiling — maxsus huquq şart emas.": ["Сделайте бота админом — особые права не нужны.", "Make the bot an admin — no special rights needed."], "Yangi postlar şu yerda paydo böladi.": ["Новые посты появятся здесь.", "New posts will appear here."], "➕ Kanal qöşiş": ["➕ Добавить канал", "➕ Add channel"], "Hec narsa topilmadi": ["Ничего не найдено", "Nothing found"], "Boşqa söz bilan urinib köring. Kirill va lotin yozuvi farqi yöq.": ["Попробуйте другое слово. Кириллица и латиница не различаются.", "Try another word. Cyrillic and Latin spellings both work."], "Arxiv hozirça böş": ["Архив пока пуст", "The archive is empty for now"], "Kanalga yangi post çiqsa, u şu yerda saqlanadi.": ["Когда в канале выйдет новый пост, он сохранится здесь.", "When a new post appears in the channel, it will be saved here."], "Yuklanmoqda…": ["Загрузка…", "Loading…"], "Yuklab bölmadi": ["Не удалось загрузить", "Couldn't load"], "Internetni tekşirib, qayta urinib köring.": ["Проверьте интернет и попробуйте снова.", "Check your internet connection and try again."], "Qayta urinish": ["Повторить", "Try again"], "Yana yuklaş": ["Загрузить ещё", "Load more"], "Barçasi": ["Все", "All"], "Tahrir tarixi": ["История правок", "Edit history"], "Hozirgi matn": ["Текущий текст", "Current text"], "(böş)": ["(пусто)", "(empty)"], "Post kanalda özgartirilgan. Eski variantlar Qora Qutida saqlangan.": ["Пост изменён в канале. Старые версии сохранены в Qora Quti.", "The post was edited in the channel. Earlier versions are kept in Qora Quti."], "Yuklab bölmadi.": ["Не удалось загрузить.", "Couldn't load."], "Töxtatiş": ["Приостановить", "Pause"], "Davom ettiriş": ["Возобновить", "Resume"], "Bajarib bölmadi": ["Не удалось выполнить", "Couldn't do that"], "📢 Kanallar va tarif": ["📢 Каналы и тариф", "📢 Channels and plan"], "Pro tarif": ["Тариф Pro", "Pro plan"], "Bepul tarif": ["Бесплатный тариф", "Free plan"], "Arxiv faqat sizga körinadi. Media fayllar 10 daqiqalik himoyalangan havola orqali oçiladi.": ["Архив виден только вам. Медиафайлы открываются по защищённой ссылке на 10 минут.", "Only you can see the archive. Media opens via a protected link valid for 10 minutes."], "Familiya": ["Фамилия", "Surname"], "Ism": ["Имя", "First name"], "Otasining ismi": ["Отчество", "Patronymic"], "Maxfiy söz (kamida 8 belgi)": ["Секретное слово (не менее 8 символов)", "Secret word (at least 8 characters)"], "Maxfiy sözni takrorlang": ["Повторите секретное слово", "Repeat the secret word"], "Tuğilgan sana": ["Дата рождения", "Date of birth"], "Maxfiy söz": ["Секретное слово", "Secret word"], "Hamma maydonlarni töldiring": ["Заполните все поля", "Fill in all fields"], "Maxfiy söz kamida 8 belgi bölsin": ["Секретное слово — не менее 8 символов", "The secret word must be at least 8 characters"], "Maxfiy sözlar bir xil emas": ["Секретные слова не совпадают", "The secret words don't match"], "Maxfiy sözda ism yoki familiya bölmasin": ["В секретном слове не должно быть имени или фамилии", "The secret word must not contain your name or surname"], "Pasport (ID karta) seriya va raqami": ["Серия и номер паспорта (ID-карты)", "Passport (ID card) series and number"], "Pasport seriya va raqamini töğri yozing, masalan AA1234567": ["Правильно укажите серию и номер паспорта, например AA1234567", "Enter the passport series and number correctly, e.g. AA1234567"], "Nomsiz": ["Без названия", "Untitled"], "Login va parol": ["Логин и пароль", "Login and password"], "Nomi (masalan: Gmail, Instagram)": ["Название (например: Gmail, Instagram)", "Name (e.g. Gmail, Instagram)"], "Login / email / telefon": ["Логин / email / телефон", "Login / email / phone"], "Parol": ["Пароль", "Password"], "Sayt yoki ilova": ["Сайт или приложение", "Website or app"], "2FA zaxira kodlari": ["Резервные коды 2FA", "2FA backup codes"], "Izoh": ["Заметка", "Note"], "Kripto hamyon": ["Криптокошелёк", "Crypto wallet"], "Nomi (masalan: Trust Wallet)": ["Название (например: Trust Wallet)", "Name (e.g. Trust Wallet)"], "Tarmoq / coin (BTC, USDT TRC20…)": ["Сеть / монета (BTC, USDT TRC20…)", "Network / coin (BTC, USDT TRC20…)"], "Hamyon manzili": ["Адрес кошелька", "Wallet address"], "Seed so'zlar (12 yoki 24 söz)": ["Seed-фраза (12 или 24 слова)", "Seed phrase (12 or 24 words)"], "Hamyon paroli / PIN": ["Пароль / PIN кошелька", "Wallet password / PIN"], "Bank karta": ["Банковская карта", "Bank card"], "Nomi (masalan: Humo, Uzcard, Visa)": ["Название (например: Humo, Uzcard, Visa)", "Name (e.g. Humo, Uzcard, Visa)"], "Karta raqami": ["Номер карты", "Card number"], "Amal qiliş muddati (OO/YY)": ["Срок действия (ММ/ГГ)", "Expiry date (MM/YY)"], "Karta egasi": ["Владелец карты", "Cardholder"], "Hujjat / ID": ["Документ / ID", "Document / ID"], "Nomi (masalan: Pasport, ID karta)": ["Название (например: Паспорт, ID-карта)", "Name (e.g. Passport, ID card)"], "Raqami / ID": ["Номер / ID", "Number / ID"], "Berilgan sana": ["Дата выдачи", "Issue date"], "Amal qiliş muddati": ["Срок действия", "Expiry date"], "Kim bergan": ["Кем выдан", "Issued by"], "Tarmoq nomi": ["Имя сети", "Network name"], "Maxfiy eslatma": ["Секретная заметка", "Secret note"], "Eslatma": ["Заметка", "Note"], "Sarlavha": ["Заголовок", "Title"], "Matn": ["Текст", "Text"], "Kalit / kod": ["Ключ / код", "Key / code"], "Nomi (masalan: Sklad eşigi, API kalit)": ["Название (например: дверь склада, API-ключ)", "Name (e.g. warehouse door, API key)"], "Kalit / kod / parol": ["Ключ / код / пароль", "Key / code / password"], "Boşqa narsa": ["Другое", "Something else"], "Nomi": ["Название", "Name"], "Maydon nomi 1": ["Название поля 1", "Field name 1"], "Qiymat 1": ["Значение 1", "Value 1"], "Maydon nomi 2": ["Название поля 2", "Field name 2"], "Qiymat 2": ["Значение 2", "Value 2"], "Maydon nomi 3": ["Название поля 3", "Field name 3"], "Qiymat 3": ["Значение 3", "Value 3"], "Loginlar": ["Логины", "Logins"], "Kripto": ["Крипто", "Crypto"], "Kartalar": ["Карты", "Cards"], "Eslatmalar": ["Заметки", "Notes"], "Kalitlar": ["Ключи", "Keys"], "Boşqa": ["Другое", "Other"], "Nusxa": ["Копия", "Copy"], "Seyf qulflandi": ["Сейф заблокирован", "Vault locked"], "⚠️ Botdan kelgan yozuv oçilmadi": ["⚠️ Запись от бота не открылась", "⚠️ Couldn't open an item from the bot"], "⚠️ Oçilmadi": ["⚠️ Не открылось", "⚠️ Couldn't open"], "Seyfdan qidiriş…": ["Поиск по сейфу…", "Search the vault…"], "Qulflaş": ["Заблокировать", "Lock"], "👤 Seyf uçun login tanlang — boşqa Telegram akkauntdan kiriş va pasport bilan parolni tiklaş uçun kerak. Bosing →": ["👤 Выберите логин для сейфа — он нужен для входа с другого аккаунта Telegram и восстановления пароля по паспорту. Нажмите →", "👤 Choose a login for the vault — you need it to sign in from another Telegram account and to recover your password with your passport. Tap →"], "🪪 Parolni unutsangiz: pasport ma'lumotlari bilan login va parolni qaytariş imkonini yoqing. Bosing →": ["🪪 Если забудете пароль: включите возврат логина и пароля по паспортным данным. Нажмите →", "🪪 In case you forget your password: turn on login and password recovery with passport details. Tap →"], "🙂 Yuz bilan tiklaşni ham yoqing — kamera bilan login va parolni qaytariş. Bosing →": ["🙂 Включите и восстановление по лицу — вернуть логин и пароль через камеру. Нажмите →", "🙂 Also turn on face recovery — get your login and password back with the camera. Tap →"], "Seyf böş": ["Сейф пуст", "The vault is empty"], "Pastdagi + tugmasi bilan parol, login, kripto hamyon, karta yoki hujjat qöşing. Hammasi telefoningizda şifrlanadi. Yoki istalgan matn, rasm, video va faylni botga taşlang — özi şifrlanib, şu yerda bölimlarga joylanadi.": ["Добавьте пароль, логин, криптокошелёк, карту или документ кнопкой + внизу. Всё шифруется на вашем телефоне. Или просто отправьте боту любой текст, фото, видео или файл — он сам зашифрует и разложит по разделам.", "Add a password, login, crypto wallet, card or document with the + button below. Everything is encrypted on your phone. Or just send the bot any text, photo, video or file — it encrypts and sorts them into sections itself."], "+ Birinçi yozuv": ["+ Первая запись", "+ First item"], "Login (masalan: durmon01)": ["Логин (например: durmon01)", "Login (e.g. durmon01)"], "Master parol (kamida 10 belgi)": ["Мастер-пароль (не менее 10 символов)", "Master password (at least 10 characters)"], "Master parolni takrorlang": ["Повторите мастер-пароль", "Repeat the master password"], "Seyfni yaratiş": ["Создать сейф", "Create vault"], "Login: 3–32 belgi, lotin harf, raqam, nuqta yoki _": ["Логин: 3–32 символа, латинские буквы, цифры, точка или _", "Login: 3–32 characters, Latin letters, digits, dot or _"], "Master parol kamida 10 belgi bölsin": ["Мастер-пароль — не менее 10 символов", "The master password must be at least 10 characters"], "Parol juda oddiy: harf, raqam va belgi aralaştiring": ["Слишком простой пароль: смешайте буквы, цифры и символы", "Password too simple: mix letters, digits and symbols"], "Parollar bir xil emas": ["Пароли не совпадают", "Passwords don't match"], "Şifrlanmoqda…": ["Шифрование…", "Encrypting…"], "Bu login band — Sozlamalarda boşqasini tanlang": ["Этот логин занят — выберите другой в настройках", "This login is taken — choose another in Settings"], "Loginni saqlab bölmadi": ["Не удалось сохранить логин", "Couldn't save the login"], "Seyf allaqaçon yaratilgan": ["Сейф уже создан", "The vault already exists"], "Yaratib bölmadi": ["Не удалось создать", "Couldn't create"], "Şaxsiy seyfni yarating": ["Создайте личный сейф", "Create your personal vault"], "Parollar, loginlar, kripto hamyonlar, karta va hujjat ma'lumotlari master parol bilan şu telefonda şifrlanadi. Uni hec kim — hatto Qora Quti ham — oça olmaydi.": ["Пароли, логины, криптокошельки, данные карт и документов шифруются мастер-паролем на этом телефоне. Никто — даже Qora Quti — не сможет их открыть.", "Passwords, logins, crypto wallets, card and document details are encrypted with your master password on this phone. Nobody — not even Qora Quti — can open them."], "Login — boşqa akkauntdan kiriş uçun": ["Логин — для входа с другого аккаунта", "Login — for signing in from another account"], "⚠️ Master parolni unutsangiz, uni faqat tiklaş kaliti bilan qaytarasiz. Ikkalasi ham yöqolsa, ma'lumotni hec kim oça olmaydi.": ["⚠️ Если забудете мастер-пароль, вернуть его можно только ключом восстановления. Если потеряны оба — данные никто не откроет.", "⚠️ If you forget the master password, only the recovery key can restore it. If both are lost, nobody can open the data."], "Avval boşqa Telegram akkauntda seyfingiz bor edimi?": ["Раньше у вас был сейф в другом аккаунте Telegram?", "Did you have a vault in another Telegram account before?"], "♻️ Eski seyfni tiklaş": ["♻️ Восстановить старый сейф", "♻️ Restore an old vault"], "👤 Login va master parol bilan kiriş": ["👤 Войти по логину и мастер-паролю", "👤 Sign in with login and master password"], "🪪 Parolni unutdim — pasport ma'lumotlari bilan": ["🪪 Забыл пароль — по паспортным данным", "🪪 Forgot password — with passport details"], "🙂 Parolni unutdim — yuz bilan": ["🙂 Забыл пароль — по лицу", "🙂 Forgot password — with my face"], "🗝 Tiklaş kaliti bilan": ["🗝 Ключом восстановления", "🗝 With the recovery key"], "📧 Gmail va şaxsiy ma'lumotlar bilan": ["📧 Через Gmail и личные данные", "📧 With Gmail and personal details"], "♻️ Eski seyfimni tiklaş": ["♻️ Восстановить мой старый сейф", "♻️ Restore my old vault"], "Tiklaş tayyor bölsa, seyf şu akkauntga köçirilgan bölişi kerak. Sahifani yangilang.": ["Если восстановление готово, сейф уже должен быть перенесён в этот аккаунт. Обновите страницу.", "If recovery is ready, the vault should already be moved to this account. Reload the page."], "Davom etiş": ["Продолжить", "Continue"], "🗝 Tiklaş kalitingiz": ["🗝 Ваш ключ восстановления", "🗝 Your recovery key"], "Master parolni unutsangiz, seyfni faqat şu kalit bilan oçasiz. Uni qog'ozga yozib, xavfsiz joyda saqlang. Bu kalit boşqa körsatilmaydi.": ["Если забудете мастер-пароль, сейф можно открыть только этим ключом. Запишите его на бумаге и храните в надёжном месте. Больше он показан не будет.", "If you forget the master password, only this key can open the vault. Write it on paper and keep it somewhere safe. It won't be shown again."], "Tiklaş kaliti": ["Ключ восстановления", "Recovery key"], "📋 Nusxa oliş": ["📋 Скопировать", "📋 Copy"], "Kalitni Telegram çatlariga, galereyaga yoki skrinşotga saqlamang.": ["Не сохраняйте ключ в чатах Telegram, галерее или на скриншотах.", "Don't save the key in Telegram chats, your gallery or screenshots."], "Kalitni xavfsiz joyga yozib qöydim": ["Я записал ключ в надёжное место", "I've written the key down somewhere safe"], "Master parol": ["Мастер-пароль", "Master password"], "Oçiş": ["Открыть", "Open"], "Tekşirilmoqda…": ["Проверка…", "Checking…"], "Parol notöğri": ["Неверный пароль", "Wrong password"], "😊 Face ID bilan oçiş": ["😊 Открыть по Face ID", "😊 Open with Face ID"], "🙂 Yuz bilan oçiş": ["🙂 Открыть по лицу", "🙂 Open with my face"], "Kamera…": ["Камера…", "Camera…"], "Barmoq izi": ["Отпечаток пальца", "Fingerprint"], "Seyf qulflangan": ["Сейф заблокирован", "Vault locked"], "Oçiş uçun master parolni kiriting.": ["Введите мастер-пароль, чтобы открыть.", "Enter the master password to open it."], "📧 Tiklaş tayyor — seyfni oçiş": ["📧 Восстановление готово — открыть сейф", "📧 Recovery is ready — open the vault"], "Parolni unutdim": ["Забыл пароль", "Forgot password"], "Qanday tiklaymiz?": ["Как восстановим?", "How shall we recover?"], "🪪 Pasport ma'lumotlari bilan (login va parolni körsatadi)": ["🪪 По паспортным данным (покажет логин и пароль)", "🪪 With passport details (shows login and password)"], "🙂 Yuz bilan (login va parolni körsatadi)": ["🙂 По лицу (покажет логин и пароль)", "🙂 With my face (shows login and password)"], "Gmail usuli faqat oldindan yoqilgan bölsa işlaydi va 7 kun kutişni talab qiladi.": ["Способ через Gmail работает, только если был включён заранее, и требует ожидания 7 дней.", "The Gmail method only works if it was turned on in advance, and it requires a 7-day wait."], "Saqlaş": ["Сохранить", "Save"], "Master parol notöğri": ["Неверный мастер-пароль", "Wrong master password"], "Bu login band, boşqasini tanlang": ["Этот логин занят, выберите другой", "This login is taken, choose another"], "👤 Seyf logini": ["👤 Логин сейфа", "👤 Vault login"], "Telefon yoki Telegram akkaunt yöqolsa, istalgan boşqa akkauntdan şu login va master parol bilan kirasiz — seyf öşa akkauntga köçadi.": ["Если потеряете телефон или аккаунт Telegram, войдёте с любого другого аккаунта по этому логину и мастер-паролю — сейф перейдёт в тот аккаунт.", "If you lose your phone or Telegram account, you can sign in from any other account with this login and master password — the vault moves to that account."], "Master parol (tasdiqlaş uçun)": ["Мастер-пароль (для подтверждения)", "Master password (to confirm)"], "Yoqiş": ["Включить", "Turn on"], "Şifrlanmoqda… (bir necha soniya)": ["Шифрование… (несколько секунд)", "Encrypting… (a few seconds)"], "🪪 Pasport bilan tiklaş yoqildi": ["🪪 Восстановление по паспорту включено", "🪪 Passport recovery is on"], "Bu ma'lumotlar boşqa seyfga bog'langan": ["Эти данные уже привязаны к другому сейфу", "These details are already linked to another vault"], "Avval login tanlang": ["Сначала выберите логин", "Choose a login first"], "🪪 Pasport ma'lumotlari bilan tiklaş": ["🪪 Восстановление по паспортным данным", "🪪 Recovery with passport details"], "Master parolni unutsangiz, şu ma'lumotlarni kiritib login va parolingizni qaytarasiz — istalgan Telegram akkauntdan. Ma'lumotlar şu telefonda kalitga aylanadi: serverga oçiq holda yuborilmaydi va saqlanmaydi. Pasportdagidek yozing.": ["Если забудете мастер-пароль, введите эти данные и получите логин и пароль — с любого аккаунта Telegram. Данные превращаются в ключ на этом телефоне: на сервер они не отправляются в открытом виде и не хранятся. Пишите как в паспорте.", "If you forget the master password, enter these details to get your login and password back — from any Telegram account. The details are turned into a key on this phone: they are not sent to the server in plain form and are not stored. Write them exactly as in your passport."], "⚠️ Pasport ma'lumotlaringizni biladigan odam ham parolni ola olişi mumkin. Har gal körilganda Telegram'ga xabar boradi.": ["⚠️ Человек, знающий ваши паспортные данные, тоже сможет получить пароль. При каждом просмотре вам придёт сообщение в Telegram.", "⚠️ Someone who knows your passport details could also get the password. You'll get a Telegram message every time it is viewed."], "Tekşiriş": ["Проверить", "Check"], "Tekşirilmoqda… (bir necha soniya)": ["Проверка… (несколько секунд)", "Checking… (a few seconds)"], "Ma'lumotlar mos kelmadi. Pasportdagidek yozilganini tekşiring": ["Данные не совпали. Проверьте, что всё написано как в паспорте", "The details didn't match. Check that everything is written as in the passport"], "Juda köp urinish. 24 soatdan keyin qayta urinib köring": ["Слишком много попыток. Попробуйте через 24 часа", "Too many attempts. Try again in 24 hours"], "Tekşirib bölmadi": ["Не удалось проверить", "Couldn't check"], "🪪 Parolni tiklaş": ["🪪 Восстановить пароль", "🪪 Recover password"], "Seyfga ulangan pasport ma'lumotlarini kiriting. Töğri bölsa, login va master parol körsatiladi. Ma'lumotlar serverga oçiq yuborilmaydi.": ["Введите паспортные данные, привязанные к сейфу. Если всё верно, будут показаны логин и мастер-пароль. Данные не отправляются на сервер в открытом виде.", "Enter the passport details linked to the vault. If they're correct, the login and master password will be shown. The details are not sent to the server in plain form."], "➡️ Şu akkauntda seyfni oçiş": ["➡️ Открыть сейф в этом аккаунте", "➡️ Open the vault in this account"], "Oçilmoqda…": ["Открывается…", "Opening…"], "Seyf oçildi": ["Сейф открыт", "Vault opened"], "Oçib bölmadi": ["Не удалось открыть", "Couldn't open"], "🔓 Seyfni oçiş": ["🔓 Открыть сейф", "🔓 Open the vault"], "✅ Topildi": ["✅ Найдено", "✅ Found"], "Parolni eslab qoling yoki xavfsiz joyga yozing. Kerak bölsa, seyfni oçib uni özgartiring.": ["Запомните пароль или запишите его в надёжное место. При необходимости откройте сейф и смените его.", "Remember the password or write it down somewhere safe. If needed, open the vault and change it."], "Kiriş": ["Войти", "Sign in"], "Login va parolni kiriting": ["Введите логин и пароль", "Enter the login and password"], "✅ Seyf şu akkauntga köçirildi va oçildi": ["✅ Сейф перенесён в этот аккаунт и открыт", "✅ The vault was moved to this account and opened"], "Login yoki parol notöğri": ["Неверный логин или пароль", "Wrong login or password"], "Juda köp urinish. Keyinroq qayta urinib köring": ["Слишком много попыток. Попробуйте позже", "Too many attempts. Try again later"], "Bu akkauntda boşqa seyf bor": ["В этом аккаунте уже есть другой сейф", "This account already has another vault"], "Kirib bölmadi": ["Не удалось войти", "Couldn't sign in"], "👤 Login bilan kiriş": ["👤 Вход по логину", "👤 Sign in with login"], "Eski seyfingiz logini va master parolini kiriting. Seyf (yozuvlar, fayllar, kanal arxivi) şu Telegram akkauntga köçadi, eski akkauntga xabar boradi.": ["Введите логин и мастер-пароль старого сейфа. Сейф (записи, файлы, архив каналов) перейдёт в этот аккаунт Telegram, старому аккаунту придёт уведомление.", "Enter the login and master password of your old vault. The vault (items, files, channel archive) moves to this Telegram account, and the old account gets a notification."], "Bu telefonda Face ID / barmoq izi Telegram orqali mavjud emas": ["На этом телефоне Face ID / отпечаток недоступен через Telegram", "Face ID / fingerprint isn't available through Telegram on this phone"], "Avval seyfni oçing": ["Сначала откройте сейф", "Open the vault first"], "Ruxsat berilmadi. Telegram sozlamalaridan yoqing": ["Доступ не дан. Включите его в настройках Telegram", "Permission denied. Turn it on in Telegram settings"], "Yoqib bölmadi": ["Не удалось включить", "Couldn't turn on"], "Master parol (bir marta)": ["Мастер-пароль (один раз)", "Master password (once)"], "Öçirildi": ["Удалено", "Deleted"], "Qora Qutini oçiş": ["Открыть Qora Quti", "Open Qora Quti"], "⬆️ Tepaga qarang": ["⬆️ Посмотрите вверх", "⬆️ Look up"], "⬇️ Pastga qarang": ["⬇️ Посмотрите вниз", "⬇️ Look down"], "⬅️ Çapga qarang": ["⬅️ Посмотрите влево", "⬅️ Look left"], "➡️ Önga qarang": ["➡️ Посмотрите вправо", "➡️ Look right"], "Yuzingizni doira içiga oling va töğriga qarang": ["Поместите лицо в круг и смотрите прямо", "Place your face in the circle and look straight ahead"], "Endi yana töğriga qarang": ["Теперь снова смотрите прямо", "Now look straight ahead again"], "Model yuklanmoqda… (bir marta, ~7 MB)": ["Загрузка модели… (один раз, ~7 МБ)", "Loading the model… (once, ~7 MB)"], "Bekor qiliş": ["Отмена", "Cancel"], "📷 Yuzni skanerlaş": ["📷 Сканировать лицо", "📷 Scan face"], "🙂 Yuz bilan oçişni sozlaş": ["🙂 Настроить вход по лицу", "🙂 Set up face unlock"], "Aytilgan tomonga sekin qarang: tepaga, pastga, çapga, önga": ["Медленно смотрите в указанную сторону: вверх, вниз, влево, вправо", "Slowly look in the direction shown: up, down, left, right"], "🙂 Endi seyfni yuzingiz bilan oçasiz": ["🙂 Теперь сейф открывается по вашему лицу", "🙂 You can now open the vault with your face"], "🙂 Yuz bilan oçiş (selfi)": ["🙂 Вход по лицу (селфи)", "🙂 Face unlock (selfie)"], "Seyfni oçişda kamera yoqiladi: tasodifiy tartibda tepaga, pastga, çapga, önga qaraysiz. Oddiy rasm yoki oldindan yozilgan video bilan oçilmaydi. Kalitning yarmi şu telefonda, yarmi serverda — boşqa telefondan yoki yuzsiz oçilmaydi.": ["При открытии сейфа включится камера: в случайном порядке посмотрите вверх, вниз, влево и вправо. Обычным фото или заранее записанным видео не открыть. Половина ключа хранится на этом телефоне, половина — на сервере: с другого телефона или без лица не открыть.", "When you open the vault the camera turns on: look up, down, left and right in random order. A plain photo or a pre-recorded video won't open it. Half of the key is on this phone and half on the server: it can't be opened from another phone or without your face."], "Yuz mos kelmadi — master parol bilan kiring": ["Лицо не совпало — войдите по мастер-паролю", "Face didn't match — sign in with the master password"], "Juda köp urinish — master parol bilan kiring": ["Слишком много попыток — войдите по мастер-паролю", "Too many attempts — sign in with the master password"], "Yuz bilan oçiş öçirilgan": ["Вход по лицу выключен", "Face unlock is turned off"], "Kameraga ruxsat berilmadi yoki kamera topilmadi": ["Нет доступа к камере или камера не найдена", "No camera access or no camera found"], "Yuz modelini yuklab bölmadi — internetni tekşiring": ["Не удалось загрузить модель лица — проверьте интернет", "Couldn't load the face model — check your internet"], "Harakat vaqtida bajarilmadi — yorug' joyda, aytilgan tomonga sekin qarab qayta urinib köring": ["Движение не выполнено вовремя — встаньте в светлое место и медленно смотрите в указанную сторону", "The movement wasn't done in time — find a bright spot and slowly look in the direction shown"], "🙂 Yuzni saqlaş": ["🙂 Сохранить лицо", "🙂 Save my face"], "Yorug' joyda, telefonni yuz baravarida uşlang": ["В светлом месте держите телефон на уровне лица", "In a bright spot, hold the phone at face level"], "🙂 Yuz bilan tiklaş yoqildi": ["🙂 Восстановление по лицу включено", "🙂 Face recovery is on"], "🙂 Yuz bilan parolni tiklaş": ["🙂 Восстановление пароля по лицу", "🙂 Password recovery with your face"], "Parolni unutsangiz, yangi telefondan login va yuzingiz bilan login-parolni qaytarasiz. Kamera tasodifiy tartibda tepaga, pastga, çapga, önga qaraşni söraydi — oddiy rasm yoki video bilan aldab bölmaydi.": ["Если забудете пароль, с нового телефона вернёте логин и пароль по логину и лицу. Камера в случайном порядке попросит посмотреть вверх, вниз, влево и вправо — обмануть фото или видео не получится.", "If you forget the password, you can get the login and password back from a new phone with your login and face. The camera asks you to look up, down, left and right in random order — a photo or video can't fool it."], "⚠️ Bu usulda yuz andozasi va parolni oçadigan kalit serverda saqlanadi. Boşqa akkauntdan so'ralsa, 24 soat kutiş va Telegram'ga ogohlantiriş boradi — şu vaqtda bekor qila olasiz.": ["⚠️ В этом способе шаблон лица и ключ, открывающий пароль, хранятся на сервере. Если запрос придёт с другого аккаунта — ожидание 24 часа и уведомление в Telegram; за это время можно отменить.", "⚠️ With this method the face template and the key that unlocks the password are stored on the server. If someone asks from another account, there's a 24-hour wait and a Telegram alert; you can cancel during that time."], "📷 Yuz bilan tekşiriş": ["📷 Проверить по лицу", "📷 Check with my face"], "Seyf loginini yozing": ["Введите логин сейфа", "Enter the vault login"], "🙂 Yuzni tekşiriş": ["🙂 Проверка лица", "🙂 Face check"], "⏳ Yuz mos keldi": ["⏳ Лицо совпало", "⏳ Face matched"], "Yuz yoki login mos kelmadi": ["Лицо или логин не совпали", "Face or login didn't match"], "🙂 Yuz bilan tiklaş": ["🙂 Восстановление по лицу", "🙂 Face recovery"], "Seyf loginini yozing va kamerada yuzingizni körsating. Mos kelsa, login va master parol körsatiladi (boşqa akkauntdan — 24 soatdan keyin).": ["Введите логин сейфа и покажите лицо камере. Если совпадёт, будут показаны логин и мастер-пароль (с другого аккаунта — через 24 часа).", "Enter the vault login and show your face to the camera. If it matches, the login and master password are shown (from another account — after 24 hours)."], "Kod yuboriş": ["Отправить код", "Send code"], "Gmail manzili notöğri": ["Неверный адрес Gmail", "Invalid Gmail address"], "Juda köp urinish, keyinroq": ["Слишком много попыток, позже", "Too many attempts, try later"], "Bu manzil boşqa seyfga ulangan": ["Этот адрес привязан к другому сейфу", "This address is linked to another vault"], "Pochta hali sozlanmagan": ["Почта ещё не настроена", "Email isn't set up yet"], "Yuborib bölmadi": ["Не удалось отправить", "Couldn't send"], "📧 Gmail orqali tiklaş yoqildi": ["📧 Восстановление через Gmail включено", "📧 Gmail recovery is on"], "Kod notöğri": ["Неверный код", "Wrong code"], "Kod eskirgan, qayta yuboring": ["Код устарел, отправьте заново", "The code has expired, send a new one"], "📧 Gmail orqali tiklaş": ["📧 Восстановление через Gmail", "📧 Gmail recovery"], "Gmail'dagi kod": ["Код из Gmail", "Code from Gmail"], "Ma'lumotlarni pasportdagidek yozing. Maxfiy sözni faqat siz biladigan qilib tanlang: tiklaş xavfsizligi şunga boğliq. Bu ma'lumotlar serverga yuborilmaydi.": ["Пишите данные как в паспорте. Секретное слово выберите такое, которое знаете только вы: от него зависит безопасность восстановления. Эти данные не отправляются на сервер.", "Write the details as in your passport. Pick a secret word only you know: recovery security depends on it. These details are not sent to the server."], "📧 Gmail orqali tiklaşni yoqiş": ["📧 Включить восстановление через Gmail", "📧 Turn on Gmail recovery"], "Master parol ham, tiklaş kaliti ham yöqolsa, seyfni Gmail kodi, familiya, ism, otasining ismi, tuğilgan sana va maxfiy söz bilan qaytarasiz. Tiklaş 7 kun kutişdan keyin oçiladi, şu vaqtda Telegram va Gmail'ga ogohlantiriş boradi.": ["Если потеряны и мастер-пароль, и ключ восстановления, сейф вернёте кодом из Gmail, фамилией, именем, отчеством, датой рождения и секретным словом. Сейф откроется через 7 дней ожидания, за это время в Telegram и Gmail придёт предупреждение.", "If both the master password and the recovery key are lost, you can restore the vault with a Gmail code, surname, first name, patronymic, date of birth and the secret word. The vault opens after a 7-day wait, during which a warning is sent to Telegram and Gmail."], "⚠️ Bu usul yoqilsa, Gmail'ingizga kira oladigan va şu ma'lumotlarni biladigan odam ham 7 kundan keyin seyfni oça oladi. Maxfiy sözni hec kimga aytmang.": ["⚠️ Если включить этот способ, человек с доступом к вашему Gmail и знающий эти данные тоже сможет открыть сейф через 7 дней. Никому не говорите секретное слово.", "⚠️ With this method on, someone who can get into your Gmail and knows these details could also open the vault after 7 days. Never tell anyone the secret word."], "Yuborilmoqda…": ["Отправка…", "Sending…"], "Tiklaş so'rovini yuboriş": ["Отправить запрос на восстановление", "Send recovery request"], "So'rov qabul qilindi": ["Запрос принят", "Request accepted"], "Ma'lumotlar mos kelmadi": ["Данные не совпали", "The details didn't match"], "📧 Seyfni tiklaş": ["📧 Восстановить сейф", "📧 Restore the vault"], "Agar bu manzil seyfga ulangan bölsa, unga kod yuborildi (Spam papkasini ham tekşiring).": ["Если этот адрес привязан к сейфу, на него отправлен код (проверьте и папку «Спам»).", "If this address is linked to a vault, a code was sent to it (check the Spam folder too)."], "📧 Gmail va şaxsiy ma'lumotlar bilan tiklaş": ["📧 Восстановление через Gmail и личные данные", "📧 Recovery with Gmail and personal details"], "Seyfga ulangan Gmail'ingizni kiriting. Ma'lumotlar tögri bölsa, xavfsizlik uçun 7 kundan keyin seyf oçiladi (yangi akkaunt bölsa, şu akkauntga köçadi).": ["Введите Gmail, привязанный к сейфу. Если данные верны, ради безопасности сейф откроется через 7 дней (если аккаунт новый — перейдёт в этот аккаунт).", "Enter the Gmail linked to the vault. If the details are correct, for security the vault opens after 7 days (if it's a new account, it moves to this account)."], "Yangi master parol": ["Новый мастер-пароль", "New master password"], "Yangi parolni takrorlang": ["Повторите новый пароль", "Repeat the new password"], "Seyfni oçiş": ["Открыть сейф", "Open the vault"], "Yangi parol kamida 10 belgi va murakkab bölsin": ["Новый пароль — не менее 10 символов и сложный", "The new password must be at least 10 characters and complex"], "Juda köp urinish, 24 soatdan keyin": ["Слишком много попыток, через 24 часа", "Too many attempts, try in 24 hours"], "Hali vaqti kelmadi": ["Время ещё не пришло", "It's not time yet"], "📧 Seyfni oçiş": ["📧 Открыть сейф", "📧 Open the vault"], "Oçilgandan keyin sizga yangi tiklaş kaliti beriladi.": ["После открытия вы получите новый ключ восстановления.", "After opening you'll get a new recovery key."], "Tiklaş": ["Восстановить", "Recover"], "Tiklaş kaliti notöğri": ["Неверный ключ восстановления", "Wrong recovery key"], "Yangi master parol örnatildi": ["Новый мастер-пароль установлен", "New master password set"], "Seyfni tiklaş": ["Восстановить сейф", "Restore the vault"], "Tiklaş kaliti 32 belgidan iborat": ["Ключ восстановления состоит из 32 символов", "The recovery key is 32 characters long"], "Bu seyf şu akkauntning özida": ["Этот сейф уже в этом аккаунте", "This vault is already in this account"], "♻️ Seyfni yangi akkauntga köçiriş": ["♻️ Перенести сейф в новый аккаунт", "♻️ Move the vault to a new account"], "Eski Telegram akkauntingiz yoki telefoningiz yöqolgan bölsa, seyfni şu akkauntga köçirasiz. Buning uçun seyf yaratilganda berilgan tiklaş kaliti kerak. Xavfsizlik uçun köçiriş 24 soatdan keyin bajariladi; şu vaqt ichida eski akkauntga ogohlantiriş boradi.": ["Если старый аккаунт Telegram или телефон потерян, перенесите сейф в этот аккаунт. Для этого нужен ключ восстановления, выданный при создании сейфа. Ради безопасности перенос выполняется через 24 часа; за это время старому аккаунту придёт предупреждение.", "If your old Telegram account or phone is lost, move the vault to this account. You need the recovery key you got when the vault was created. For security the move happens after 24 hours; meanwhile the old account gets a warning."], "Yuz bilan tiklaş kutilmoqda": ["Ожидание восстановления по лицу", "Waiting for face recovery"], "🙂 Yuzni qayta tekşiriş": ["🙂 Проверить лицо снова", "🙂 Check my face again"], "Boşqa usul": ["Другой способ", "Another method"], "Köçiriş kutilmoqda": ["Ожидание переноса", "Waiting for the move"], "Muddat tugagach, Qora Qutini oçib, şaxsiy ma'lumotlaringizni qayta kiritasiz va yangi master parol örnatasiz.": ["Когда срок истечёт, откройте Qora Quti, снова введите личные данные и установите новый мастер-пароль.", "When the time is up, open Qora Quti, enter your personal details again and set a new master password."], "Köçgandan keyin seyfni eski master parol yoki tiklaş kaliti bilan oçasiz.": ["После переноса откройте сейф старым мастер-паролем или ключом восстановления.", "After the move, open the vault with the old master password or the recovery key."], "Nima saqlaymiz?": ["Что сохраним?", "What shall we save?"], "🎲 Yaratiş": ["🎲 Сгенерировать", "🎲 Generate"], "Nomini yozing": ["Введите название", "Enter a name"], "Saqlandi 🔐": ["Сохранено 🔐", "Saved 🔐"], "Yozuvlar soni limitga yetdi": ["Достигнут лимит записей", "Item limit reached"], "Saqlaşdan oldin şu telefonda şifrlanadi.": ["Перед сохранением шифруется на этом телефоне.", "Encrypted on this phone before saving."], "🗑 Öçiriş": ["🗑 Удалить", "🗑 Delete"], "Rostdan öçirilsinmi? Yana bir bosing": ["Точно удалить? Нажмите ещё раз", "Really delete? Tap once more"], "Öçirib bölmadi": ["Не удалось удалить", "Couldn't delete"], "Bu yozuvni oçib bölmadi.": ["Не удалось открыть эту запись.", "Couldn't open this item."], "✏️ Tahrirlaş": ["✏️ Изменить", "✏️ Edit"], "🔑 Master parolni özgartiriş": ["🔑 Сменить мастер-пароль", "🔑 Change master password"], "Hozirgi master parol": ["Текущий мастер-пароль", "Current master password"], "Özgartiriş": ["Сменить", "Change"], "Hozirgi parol notöğri": ["Неверный текущий пароль", "Wrong current password"], "Login tekşiruvini yangilab bölmadi": ["Не удалось обновить проверку логина", "Couldn't update the login check"], "Pasport tiklaşini yangilab bölmadi": ["Не удалось обновить восстановление по паспорту", "Couldn't update passport recovery"], "Yuz tiklaşini yangilab bölmadi": ["Не удалось обновить восстановление по лицу", "Couldn't update face recovery"], "Master parol özgartirildi": ["Мастер-пароль изменён", "Master password changed"], "Master parolni özgartiriş": ["Смена мастер-пароля", "Change master password"], "🗝 Yangi tiklaş kaliti": ["🗝 Новый ключ восстановления", "🗝 New recovery key"], "Yangi kalit yaratiş": ["Создать новый ключ", "Create a new key"], "Yangi tiklaş kaliti": ["Новый ключ восстановления", "New recovery key"], "Eski tiklaş kaliti işlamay qoladi.": ["Старый ключ восстановления перестанет работать.", "The old recovery key will stop working."], "Himoya yoqildi": ["Защита включена", "Protection on"], "Himoya öçirildi": ["Защита выключена", "Protection off"], "🔐 Seyf": ["🔐 Сейф", "🔐 Vault"], "Himoyalangan rejim": ["Защищённый режим", "Protected mode"], "Bot yuborgan xabar va fayllarni forward qiliş, saqlaş va telefonda skrinşot oliş taqiqlanadi": ["Запрещены пересылка и сохранение сообщений и файлов от бота, а также скриншоты на телефоне", "Forwarding and saving the bot's messages and files, and taking screenshots on the phone, are blocked"], "👤 Login": ["👤 Логин", "👤 Login"], "Tanlaş": ["Выбрать", "Choose"], "🪪 Pasport bilan tiklaş yoqilgan": ["🪪 Восстановление по паспорту включено", "🪪 Passport recovery is on"], "Login va parolni pasport ma'lumotlari bilan qaytariş": ["Возврат логина и пароля по паспортным данным", "Get your login and password back with passport details"], "Rostdan?": ["Точно?", "Sure?"], "Öçiriş": ["Выключить", "Turn off"], "🪪 Pasport bilan parolni tiklaşni yoqiş": ["🪪 Включить восстановление пароля по паспорту", "🪪 Turn on password recovery with passport"], "😊 Face ID bilan oçiş (yoqiş / öçiriş)": ["😊 Вход по Face ID (вкл. / выкл.)", "😊 Face ID unlock (on / off)"], "🙂 Yuz bilan oçiş — selfi (yoqiş / öçiriş)": ["🙂 Вход по лицу — селфи (вкл. / выкл.)", "🙂 Face unlock — selfie (on / off)"], "Bu telefonda barmoq izi Telegram orqali mavjud emas": ["На этом телефоне отпечаток недоступен через Telegram", "Fingerprint isn't available through Telegram on this phone"], "👆 Barmoq izi bilan oçiş (yoqiş / öçiriş)": ["👆 Вход по отпечатку (вкл. / выкл.)", "👆 Fingerprint unlock (on / off)"], "🙂 Yuz bilan tiklaş yoqilgan": ["🙂 Восстановление по лицу включено", "🙂 Face recovery is on"], "Login va parolni yuz bilan qaytariş": ["Возврат логина и пароля по лицу", "Get your login and password back with your face"], "🙂 Yuz bilan parolni tiklaşni yoqiş": ["🙂 Включить восстановление пароля по лицу", "🙂 Turn on password recovery with your face"], "📧 Gmail orqali tiklaş yoqilgan": ["📧 Восстановление через Gmail включено", "📧 Gmail recovery is on"], "Gmail tiklaş öçirildi": ["Восстановление через Gmail выключено", "Gmail recovery turned off"], "🔒 Hozir qulflaş": ["🔒 Заблокировать сейчас", "🔒 Lock now"], "🖼 Rasmlar": ["🖼 Фото", "🖼 Photos"], "🎬 Videolar": ["🎬 Видео", "🎬 Videos"], "🎵 Audio": ["🎵 Аудио", "🎵 Audio"], "📄 Hujjatlar": ["📄 Документы", "📄 Documents"], "🔒 Şifrlangan fayl": ["🔒 Зашифрованный файл", "🔒 Encrypted file"], "Rasm": ["Фото", "Photo"], "Video": ["Видео", "Video"], "Video xabar": ["Видеосообщение", "Video message"], "Telegram bulutida (20 MB dan katta)": ["В облаке Telegram (больше 20 МБ)", "In Telegram's cloud (over 20 MB)"], "nusxasi yozilmoqda…": ["копия записывается…", "copy being saved…"], "🔒 şifrlangan": ["🔒 зашифрован", "🔒 encrypted"], "şifrlaşni kutyapti": ["ожидает шифрования", "waiting for encryption"], "şifrlanmoqda…": ["шифруется…", "encrypting…"], "Fayllar seyf içida": ["Файлы внутри сейфа", "Files are inside the vault"], "Rasm, video va hujjatlarni körish uçun seyfni master parol bilan oçing.": ["Чтобы увидеть фото, видео и документы, откройте сейф мастер-паролем.", "To see photos, videos and documents, open the vault with your master password."], "🔐 Seyfni oçiş": ["🔐 Открыть сейф", "🔐 Open the vault"], "📥 Rasm, video, fayl yoki matnni botga taşlang (bir vaqtda yuzlab bölsa ham) — özi şifrlanib, şu yerda bölimlarga joylanadi. Yoki pastdagi ⬆ tugmasi bilan yuklang.": ["📥 Отправьте боту фото, видео, файл или текст (хоть сотни сразу) — они сами зашифруются и разложатся здесь по разделам. Или загрузите кнопкой ⬆ внизу.", "📥 Send the bot a photo, video, file or text (even hundreds at once) — they're encrypted and sorted into sections here automatically. Or upload with the ⬆ button below."], "Hali fayl yöq": ["Файлов пока нет", "No files yet"], "Rasm, video, hujjat — istalgan narsani botga taşlang.": ["Фото, видео, документы — отправьте боту что угодно.", "Photos, videos, documents — send the bot anything."], "👁 Oçiş": ["👁 Открыть", "👁 Open"], "Şifr oçilmoqda…": ["Расшифровка…", "Decrypting…"], "📤 Bot çatiga yuboriş": ["📤 Отправить в чат бота", "📤 Send to the bot chat"], "Bot çatiga yuborildi (himoyalangan)": ["Отправлено в чат бота (защищённо)", "Sent to the bot chat (protected)"], "⬇️ Zaxira nusxani yuklaş": ["⬇️ Скачать резервную копию", "⬇️ Download the backup copy"], "Fayl 20 MB dan katta: u Telegram bulutida turadi, bot uni faqat sizga himoyalangan holda qayta yuboradi.": ["Файл больше 20 МБ: он хранится в облаке Telegram, бот отправляет его только вам и в защищённом виде.", "The file is over 20 MB: it stays in Telegram's cloud, and the bot sends it only to you, protected."], "Fayl şifrlaşni kutyapti — bir necha daqiqada tayyor böladi.": ["Файл ожидает шифрования — будет готов через несколько минут.", "The file is waiting for encryption — it will be ready in a few minutes."], "Fayl tayyorlanmoqda…": ["Файл готовится…", "Preparing the file…"], "⬇️ Qurilmaga saqlaş": ["⬇️ Сохранить на устройство", "⬇️ Save to device"], "Bu fayl turini şu yerda körsatib bölmaydi. Qurilmaga saqlang.": ["Этот тип файла здесь показать нельзя. Сохраните его на устройство.", "This file type can't be shown here. Save it to your device."], "Şifrlab yuklaş uçun avval Seyf'ni oçing": ["Чтобы загрузить с шифрованием, сначала откройте сейф", "Open the vault first to upload with encryption"], "böş fayl": ["пустой файл", "empty file"], "🔒 Şifrlab saqlandi": ["🔒 Зашифровано и сохранено", "🔒 Encrypted and saved"], "Fayllarni yuklab bölmadi": ["Не удалось загрузить файлы", "Couldn't load files"], "Telegram ichida oçing": ["Откройте внутри Telegram", "Open inside Telegram"], "Qora Quti faqat Telegram'dagi @qora_quti_bot orqali oçiladi.": ["Qora Quti открывается только через @qora_quti_bot в Telegram.", "Qora Quti opens only through @qora_quti_bot in Telegram."], "Kiriş tasdiqlanmadi": ["Вход не подтверждён", "Sign-in not confirmed"], "Ulanib bölmadi": ["Не удалось подключиться", "Couldn't connect"], "Mini App'ni bot menyusidan qayta oçing.": ["Откройте Mini App заново из меню бота.", "Reopen the Mini App from the bot's menu."], "Birozdan keyin qayta urinib köring.": ["Попробуйте чуть позже.", "Try again a bit later."], "Seyf": ["Сейф", "Vault"], "Fayllar": ["Файлы", "Files"], "Kanallar": ["Каналы", "Channels"], "Arxivdan qidiriş…": ["Поиск по архиву…", "Search the archive…"], "Sozlamalar": ["Настройки", "Settings"], "Qöşiş": ["Добавить", "Add"], "Rasmlar": ["Фото", "Photos"], "Videolar": ["Видео", "Videos"], "Hujjatlar": ["Документы", "Documents"], "Seed so'zlar": ["Seed-фраза", "Seed phrase"], "Maxfiy kalit (private key)": ["Приватный ключ", "Private key"], "Parol / kod": ["Пароль / код", "Password / code"], "Avto-qulf: 5 daqiqa harakatsizlikdan keyin.": ["Автоблокировка: через 5 минут бездействия.", "Auto-lock: after 5 minutes of inactivity."], "Telegram bulutida": ["В облаке Telegram", "In Telegram's cloud"], "zaxira nusxa": ["резервная копия", "backup copy"], "nusxa olinmadi": ["копия не сохранена", "copy not saved"], "Telegram + zaxira nusxa": ["Telegram + резервная копия", "Telegram + backup copy"], "barmoq izi": ["отпечаток пальца", "fingerprint"], "Login": ["Логин", "Login"], "Til": ["Язык", "Language"], "🌐 Til / Язык / Language": ["🌐 Til / Язык / Language", "🌐 Til / Язык / Language"], "yozilmoqda": ["записывается", "recording"]}, "P": [["{1} olindi · 30 soniyadan keyin tozalanadi", "{1}: скопировано · очистится через 30 секунд", "{1} copied · cleared in 30 seconds"], ["Avvalgi variant · {1} gaça", "Предыдущая версия · до {1}", "Earlier version · until {1}"], ["✎ {1} marta tahrirlangan", "✎ изменён {1} раз(а)", "✎ edited {1} time(s)"], ["Tarifingizda {1} ta kanal. Avval boşqasini töxtating.", "В вашем тарифе {1} канал(ов). Сначала приостановите другой.", "Your plan allows {1} channel(s). Pause another one first."], ["{1} ta post", "{1} постов", "{1} posts"], ["{1} ta kanal", "{1} канал(ов)", "{1} channel(s)"], ["işlatilgan {1}", "использовано {1}", "{1} used"], ["🔐 Botga taşlangan {1} ta fayl şifrlanmoqda", "🔐 Шифруется файлов, отправленных боту: {1}", "🔐 Encrypting {1} file(s) sent to the bot"], ["Login saqlandi: {1}", "Логин сохранён: {1}", "Login saved: {1}"], ["⏳ Tiklaş so'rovi bor: {1} da oçiladi.", "⏳ Есть запрос на восстановление: откроется {1}.", "⏳ A recovery request is pending: it opens on {1}."], ["Qora Qutini {1} bilan oçiş uçun", "Чтобы открывать Qora Quti с помощью {1}", "To open Qora Quti with {1}"], ["😊 {1} bilan oçiş yoqildi", "😊 Вход через {1} включён", "😊 {1} unlock is on"], ["😊 {1} bilan oçiş", "😊 Открыть: {1}", "😊 Open with {1}"], ["Keyingi safar seyfni master parol yozmasdan, {1} bilan oçasiz. Kalit faqat şu telefonning xavfsiz xotirasida turadi — yuzingiz yoki barmoq izingiz hec qayerga yuborilmaydi.", "В следующий раз откроете сейф без мастер-пароля — через {1}. Ключ хранится только в защищённой памяти этого телефона — лицо и отпечаток никуда не отправляются.", "Next time you'll open the vault without typing the master password — with {1}. The key stays only in this phone's secure storage — your face or fingerprint is never sent anywhere."], ["{1} kaliti eskirgan — master parol bilan kiring", "Ключ {1} устарел — войдите по мастер-паролю", "The {1} key is outdated — sign in with the master password"], ["Xavfsizlik uçun login va parol {1} da körsatiladi. Şu vaqtda seyf egasiga ogohlantiriş bordi. Muddat tugagach, Qora Qutini oçib, yuzni qayta tekşiring.", "Ради безопасности логин и пароль будут показаны {1}. Владельцу сейфа отправлено предупреждение. Когда срок истечёт, откройте Qora Quti и снова проверьте лицо.", "For security the login and password will be shown on {1}. The vault owner has been warned. When the time is up, open Qora Quti and check your face again."], ["Login va parol {1} dan keyin körsatiladi. Seyf egasiga ogohlantiriş yuborildi.", "Логин и пароль будут показаны после {1}. Владельцу сейфа отправлено предупреждение.", "The login and password will be shown after {1}. The vault owner has been warned."], ["Seyfingiz {1} da şu akkauntga köçadi. Bot sizga xabar beradi.", "Сейф перейдёт в этот аккаунт {1}. Бот сообщит вам.", "Your vault moves to this account on {1}. The bot will let you know."], ["yangilangan {1}", "обновлено {1}", "updated {1}"], ["Şifrlanib yuklanmoqda… {1}%", "Шифрование и загрузка… {1}%", "Encrypting and uploading… {1}%"], ["Şifr oçilmoqda… {1}%", "Расшифровка… {1}%", "Decrypting… {1}%"], ["{1} manziliga kod yuborildi (Spam papkasini ham tekşiring).", "Код отправлен на {1} (проверьте и «Спам»).", "A code was sent to {1} (check Spam too)."], ["Xato: {1}", "Ошибка: {1}", "Error: {1}"], ["{1} bilan oçiş uçun", "чтобы открывать через {1}", "to open with {1}"]]};
+  const LI = LANG === "ru" ? 0 : 1;
+  const PATS = I18N.P.map(([uz, ru, en]) => {
+    const esc = uz.replace(/[.*+?^$()|[\]\\]/g, "\\$&").replace(/\{(\d)\}/g, "(?<g$1>.+?)");
+    return { re: new RegExp("^" + esc + "$"), out: LANG === "ru" ? ru : en };
+  });
+  const LEAD = /^([^A-Za-zÀ-ɏЀ-ӿ]*)([\s\S]*?)([\s\d.,:%…!?()+-]*)$/;
+  function tr(s) {
+    if (LANG === "uz" || typeof s !== "string" || !s.trim()) return s;
+    const hit = I18N.D[s];
+    if (hit) return hit[LI];
+    for (const p of PATS) {
+      const m = p.re.exec(s);
+      if (m) return p.out.replace(/\{(\d)\}/g, (_, n) => tr(m.groups["g" + n]));
+    }
+    if (s.includes(" · ")) {
+      const parts = s.split(" · "), out = parts.map(tr);
+      if (out.some((x, i) => x !== parts[i])) return out.join(" · ");
+    }
+    const m = LEAD.exec(s);
+    if (m && m[2] && (m[1] || m[3])) {
+      const core = I18N.D[m[2]] ? I18N.D[m[2]][LI] : null;
+      if (core) return m[1] + core + m[3];
+    }
+    return s;
+  }
+  const RAW = ".val, .rk, .text, input, textarea, pre";
+  function trNode(n) {
+    if (n.nodeType === 3) {
+      if (n.parentElement && n.parentElement.closest(RAW)) return;
+      const t = tr(n.data);
+      if (t !== n.data) n.data = t;
+    } else if (n.nodeType === 1) {
+      for (const a of ["placeholder", "aria-label", "title"]) {
+        const v = n.getAttribute && n.getAttribute(a);
+        if (v) { const t = tr(v); if (t !== v) n.setAttribute(a, t); }
+      }
+      if (n.matches && n.matches(RAW)) return;
+      for (const c of n.childNodes) trNode(c);
+    }
+  }
+  if (LANG !== "uz") {
+    trNode(document.body);
+    new MutationObserver((ms) => {
+      for (const m of ms) {
+        if (m.type === "characterData") trNode(m.target);
+        else if (m.type === "attributes") trNode(m.target);
+        else for (const n of m.addedNodes) trNode(n);
+      }
+    }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["placeholder", "aria-label", "title"] });
+  }
+  function setLang(l) {
+    try { localStorage.setItem("qq_lang", l); } catch (_) {}
+    api("/settings", { method: "POST", body: { lang: l } }).catch(() => {}).finally(() => location.reload());
+  }
+  function langRow() {
+    const names = { uz: "O'zbekça", ru: "Русский", en: "English" };
+    return el("div", { class: "chips", style: "margin:0 0 14px" }, LANGS.map((l) =>
+      el("button", { class: "chip" + (l === LANG ? " on" : ""), onclick: () => l !== LANG && setLang(l) }, (l === "uz" ? "🇺🇿 " : l === "ru" ? "🇷🇺 " : "🇬🇧 ") + names[l])));
+  }
+
+
 
   if (tg) {
     tg.ready();
@@ -240,6 +321,10 @@
       .formatToParts(d).reduce((a, x) => (a[x.type] = x.value, a), {});
     const now = new Date();
     const sameYear = String(now.getFullYear()) === p.year;
+    if (LANG !== "uz") {
+      return new Intl.DateTimeFormat(LANG === "ru" ? "ru-RU" : "en-GB", { timeZone: "Asia/Tashkent", day: "numeric", month: "long",
+        ...(sameYear ? {} : { year: "numeric" }), hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(d);
+    }
     return `${Number(p.day)}-${MONTHS[Number(p.month) - 1]}${sameYear ? "" : " " + p.year}, ${p.hour}:${p.minute}`;
   }
   function fmtDur(s) {
@@ -561,6 +646,7 @@
         el("div", { class: "grow" }, el("div", { class: "t" }, c.title || "Kanal"), el("div", { class: "s" }, `${STATUS[c.status] || c.status} · ${c.posts_count} ta post`)), btn);
     });
     openSheet(
+      el("h3", { style: "margin-top:6px" }, "🌐 Til / Язык / Language"), langRow(),
       ...vaultSettings(),
       el("h3", null, "📢 Kanallar va tarif"),
       ...rows,
@@ -630,11 +716,171 @@
     const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: te.encode("qq-transfer-v1"), iterations: 100000 }, base, 256);
     return toHex(new Uint8Array(bits));
   }
+  // ---- Gmail + shaxsiy ma'lumotlar bilan zaxira: javoblar telefonda kalitga aylanadi, serverga faqat xesh ketadi
+  const CYRL = { а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "yo", ж: "j", з: "z", и: "i", й: "y", к: "k", л: "l", м: "m", н: "n",
+    о: "o", п: "p", р: "r", с: "s", т: "t", у: "u", ф: "f", х: "x", ц: "ts", ч: "ç", ш: "ş", щ: "ş", ъ: "", ы: "i", ь: "",
+    э: "e", ю: "yu", я: "ya", ў: "ö", қ: "q", ғ: "ğ", ҳ: "h" };
+  function normAns(v) {
+    let x = String(v || "").toLowerCase();
+    x = x.replace(/[\u0400-\u04FF]/g, (c) => CYRL[c] ?? c);
+    x = x.replace(/o[ʻ‘'`’]/g, "ö").replace(/g[ʻ‘'`’]/g, "ğ").replace(/sh/g, "ş").replace(/ch/g, "ç").replace(/[ʻ‘'`’ʼ]/g, "");
+    return x.replace(/\s+/g, " ").trim();
+  }
+  async function deriveD(a, saltB64) {
+    const text = ["qq-backup-v1", normAns(a.fam), normAns(a.ism), normAns(a.ota), a.dob, normAns(a.word)].join("\n");
+    const base = await crypto.subtle.importKey("raw", te.encode(text), "PBKDF2", false, ["deriveBits"]);
+    const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: B64.dec(saltB64), iterations: ITER }, base, 256);
+    return toHex(new Uint8Array(bits));
+  }
+  async function backupKek(dHex, pepperB64) {
+    const d = new Uint8Array(dHex.match(/../g).map((h) => parseInt(h, 16))), p = B64.dec(pepperB64);
+    const mix = new Uint8Array(d.length + p.length); mix.set(d); mix.set(p, d.length);
+    const raw = new Uint8Array(await crypto.subtle.digest("SHA-256", mix));
+    return crypto.subtle.importKey("raw", raw, { name: "AES-GCM" }, false, ["encrypt", "decrypt"]);
+  }
+  const verifierOf = async (dHex) => toHex(new Uint8Array(await crypto.subtle.digest("SHA-256", te.encode("verify:" + dHex))));
+  function answersForm(confirmWord) {
+    const f = {
+      fam: el("input", { class: "inp", placeholder: "Familiya", autocomplete: "off" }),
+      ism: el("input", { class: "inp", placeholder: "Ism", autocomplete: "off" }),
+      ota: el("input", { class: "inp", placeholder: "Otasining ismi", autocomplete: "off" }),
+      dob: el("input", { class: "inp", type: "date" }),
+      word: el("input", { class: "inp", type: "password", placeholder: "Maxfiy söz (kamida 8 belgi)", autocomplete: "new-password" }),
+      word2: confirmWord ? el("input", { class: "inp", type: "password", placeholder: "Maxfiy sözni takrorlang", autocomplete: "new-password" }) : null,
+    };
+    const rows = [
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Familiya"), f.fam),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Ism"), f.ism),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Otasining ismi"), f.ota),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Tuğilgan sana"), f.dob),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Maxfiy söz"), f.word),
+      f.word2 ? el("div", { class: "fld" }, f.word2) : null,
+    ];
+    const read = () => {
+      const a = { fam: f.fam.value, ism: f.ism.value, ota: f.ota.value, dob: f.dob.value, word: f.word.value };
+      if (!normAns(a.fam) || !normAns(a.ism) || !normAns(a.ota) || !/^\d{4}-\d{2}-\d{2}$/.test(a.dob)) throw new Error("Hamma maydonlarni töldiring");
+      if (normAns(a.word).length < 8) throw new Error("Maxfiy söz kamida 8 belgi bölsin");
+      if (f.word2 && normAns(f.word2.value) !== normAns(a.word)) throw new Error("Maxfiy sözlar bir xil emas");
+      const w = normAns(a.word);
+      if ([a.fam, a.ism, a.ota].some((x) => normAns(x) && w.includes(normAns(x)))) throw new Error("Maxfiy sözda ism yoki familiya bölmasin");
+      return a;
+    };
+    const clear = () => Object.values(f).forEach((i) => { if (i) i.value = ""; });
+    return { rows, read, clear };
+  }
+
   async function transferHash(rk) {
     return toHex(new Uint8Array(await crypto.subtle.digest("SHA-256", te.encode(await transferToken(rk)))));
   }
 
-  const V = { keys: null, dek: null, items: [], filter: "all", q: "", last: Date.now(), hiddenAt: 0 };
+  // ---- Ochiq/yopiq kalit (ECDH P-256): bot tashlangan narsalarni OCHIQ kalit bilan shifrlaydi,
+  //      yopiq kalit seyf ichida DEK bilan o'ralgan — demak ular faqat master parol bilan ochiladi.
+  async function pkOpen(box64) {
+    const box = B64.dec(box64);
+    const epk = box.slice(0, 65), iv = box.slice(65, 77), ct = box.slice(77);
+    const pub = await crypto.subtle.importKey("raw", epk, { name: "ECDH", namedCurve: "P-256" }, false, []);
+    const bits = await crypto.subtle.deriveBits({ name: "ECDH", public: pub }, V.priv, 256);
+    const hk = await crypto.subtle.importKey("raw", bits, "HKDF", false, ["deriveKey"]);
+    const key = await crypto.subtle.deriveKey({ name: "HKDF", hash: "SHA-256", salt: epk, info: te.encode("qq-pk1") }, hk, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+    return new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv, additionalData: te.encode("qq:pk1") }, key, ct));
+  }
+  async function ensureKeyPair() {
+    if (V.keys.pub_key && V.keys.priv_wrapped) {
+      const raw = await unseal(V.dek, B64.dec(V.keys.priv_wrapped), "qq:priv");
+      V.priv = await crypto.subtle.importKey("pkcs8", raw, { name: "ECDH", namedCurve: "P-256" }, false, ["deriveBits"]);
+      raw.fill(0);
+      return;
+    }
+    const kp = await crypto.subtle.generateKey({ name: "ECDH", namedCurve: "P-256" }, true, ["deriveBits"]);
+    const pub = new Uint8Array(await crypto.subtle.exportKey("raw", kp.publicKey));
+    const pk8 = new Uint8Array(await crypto.subtle.exportKey("pkcs8", kp.privateKey));
+    let r;
+    try { r = await api("/vault/pubkey", { method: "POST", body: { pub_key: B64.enc(pub), priv_wrapped: B64.enc(await seal(V.dek, pk8, "qq:priv")) } }); }
+    catch (e) { pk8.fill(0); if (e.message === "exists") { await loadKeys(); return ensureKeyPair(); } throw e; }
+    pk8.fill(0);
+    V.priv = await crypto.subtle.importKey("pkcs8", new Uint8Array(await crypto.subtle.exportKey("pkcs8", kp.privateKey)), { name: "ECDH", namedCurve: "P-256" }, false, ["deriveBits"]);
+    await loadKeys();
+    if (r && r.queued) toast(`🔐 Botga taşlangan ${r.queued} ta fayl şifrlanmoqda`);
+  }
+
+  // ---- PBKDF2 → hex (login tekshiruvi va pasport bilan tiklash uchun)
+  async function pbkdfHex(secret, saltBytes, iterations) {
+    const base = await crypto.subtle.importKey("raw", te.encode(secret), "PBKDF2", false, ["deriveBits"]);
+    return toHex(new Uint8Array(await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: saltBytes, iterations }, base, 256)));
+  }
+  const sha256Hex = async (s) => toHex(new Uint8Array(await crypto.subtle.digest("SHA-256", te.encode(s))));
+  const normLogin = (s) => { const v = String(s || "").trim().toLowerCase(); return /^[a-z0-9][a-z0-9._]{2,31}$/.test(v) ? v : null; };
+  // Login tekshiruvi: serverda faqat SHA256("auth:" + PBKDF2(parol, auth_salt)) turadi
+  async function authFor(password) {
+    const salt = B64.enc(rand(16));
+    const proof = await pbkdfHex(password, B64.dec(salt), ITER);
+    return { auth_salt: salt, auth_hash: await sha256Hex("auth:" + proof) };
+  }
+  async function setLogin(login, password) {
+    await api("/vault/login", { method: "POST", body: { login, ...(await authFor(password)) } });
+    await loadKeys();
+  }
+
+  // ---- Pasport ma'lumotlari bilan tiklash: ma'lumot telefonda kalitga aylanadi, serverga faqat xesh va shifrmatn boradi
+  const normPass = (s) => String(s || "").toUpperCase().replace(/[\s-]/g, "");
+  async function idDerive(a) {
+    const text = ["qq-id-v1", normAns(a.fam), normAns(a.ism), normAns(a.ota), a.dob, normPass(a.pass)].join("\n");
+    const salt = new Uint8Array(await crypto.subtle.digest("SHA-256", te.encode("qq-id-salt:" + normPass(a.pass)))).slice(0, 16);
+    const d = await pbkdfHex(text, salt, ITER);
+    return { d, lookup: await sha256Hex("lookup:" + d) };
+  }
+  async function idKeyRaw(dHex, pepperB64) {
+    const d = new Uint8Array(dHex.match(/../g).map((h) => parseInt(h, 16))), p = B64.dec(pepperB64);
+    const mix = new Uint8Array(d.length + p.length); mix.set(d); mix.set(p, d.length);
+    return new Uint8Array(await crypto.subtle.digest("SHA-256", mix));
+  }
+  async function idBlob(raw, login, password) {
+    return B64.enc(await seal(await importDek(raw.slice()), te.encode(JSON.stringify({ v: 1, login, password })), "qq:idrec"));
+  }
+  // Parol yoki login o'zgarsa — pasport bilan tiklash ma'lumoti ham yangilanadi (kalit DEK bilan o'ralgan holda saqlanadi)
+  async function refreshIdBlob(login, password) {
+    if (!V.keys || !V.keys.has_idrec || !V.keys.idkey_wrapped || !V.dek) return;
+    const raw = await unseal(V.dek, B64.dec(V.keys.idkey_wrapped), "qq:idkey");
+    await api("/idrec/update", { method: "POST", body: { blob: await idBlob(raw, login, password) } });
+    raw.fill(0);
+  }
+  function idForm() {
+    const f = {
+      fam: el("input", { class: "inp", placeholder: "Familiya", autocomplete: "off" }),
+      ism: el("input", { class: "inp", placeholder: "Ism", autocomplete: "off" }),
+      ota: el("input", { class: "inp", placeholder: "Otasining ismi", autocomplete: "off" }),
+      dob: el("input", { class: "inp", type: "date" }),
+      pass: el("input", { class: "inp mono", placeholder: "AA1234567", autocomplete: "off", autocapitalize: "characters" }),
+    };
+    const rows = [
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Familiya"), f.fam),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Ism"), f.ism),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Otasining ismi"), f.ota),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Tuğilgan sana"), f.dob),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Pasport (ID karta) seriya va raqami"), f.pass),
+    ];
+    const read = () => {
+      const a = { fam: f.fam.value, ism: f.ism.value, ota: f.ota.value, dob: f.dob.value, pass: f.pass.value };
+      if (!normAns(a.fam) || !normAns(a.ism) || !normAns(a.ota) || !/^\d{4}-\d{2}-\d{2}$/.test(a.dob)) throw new Error("Hamma maydonlarni töldiring");
+      if (!/^[A-Z]{1,3}\d{6,9}$/.test(normPass(a.pass))) throw new Error("Pasport seriya va raqamini töğri yozing, masalan AA1234567");
+      return a;
+    };
+    const clear = () => Object.values(f).forEach((i) => { i.value = ""; });
+    return { rows, read, clear };
+  }
+
+  // Botdan kelgan yozuv: matn qaysi maydonga tushishini server nom va ko'rinishiga qarab aytgan ("pair" — login + parol)
+  function fieldsFromDrop(k, text, name) {
+    const f = { title: name || "Nomsiz" };
+    if (k === "pair") {
+      let parts = text.split(/\n/).map((x) => x.trim()).filter(Boolean);
+      if (parts.length < 2) { const m = text.match(/^\s*([^\s:|]+)\s*[:|\s]\s*(\S+)\s*$/); if (m) parts = [m[1], m[2]]; }
+      if (parts.length >= 2) { f.username = parts[0]; f.password = parts.slice(1).join(" "); } else f.password = text;
+    } else f[k || "value"] = text;
+    return f;
+  }
+
+  const V = { keys: null, dek: null, items: [], filter: "all", q: "", last: Date.now(), hiddenAt: 0, priv: null };
 
   const TYPES = {
     login: { ic: "🔑", name: "Login va parol", sub: (f) => f.username || f.url || "", fields: [
@@ -652,10 +898,14 @@
       ["expires", "Amal qiliş muddati"], ["issuer", "Kim bergan"], ["note", "Izoh", "multi"]] },
     wifi: { ic: "📶", name: "Wi-Fi", sub: () => "Wi-Fi", fields: [["title", "Tarmoq nomi"], ["password", "Parol", "secret gen"], ["note", "Izoh", "multi"]] },
     note: { ic: "📝", name: "Maxfiy eslatma", sub: () => "Eslatma", fields: [["title", "Sarlavha"], ["text", "Matn", "secret multi"]] },
-    other: { ic: "🗝", name: "Boşqa narsa", sub: (f) => f.field1 || "", fields: [
+    key: { ic: "🗝", name: "Kalit / kod", sub: () => "Kalit / kod", fields: [
+      ["title", "Nomi (masalan: Sklad eşigi, API kalit)"], ["value", "Kalit / kod / parol", "secret multi mono"], ["note", "Izoh", "multi"]] },
+    other: { ic: "📦", name: "Boşqa narsa", sub: (f) => f.field1 || "", fields: [
       ["title", "Nomi"], ["field1", "Maydon nomi 1"], ["value1", "Qiymat 1", "secret multi"], ["field2", "Maydon nomi 2"],
       ["value2", "Qiymat 2", "secret multi"], ["field3", "Maydon nomi 3"], ["value3", "Qiymat 3", "secret multi"], ["note", "Izoh", "multi"]] },
   };
+
+  const SHORT = { login: "Loginlar", crypto: "Kripto", card: "Kartalar", document: "ID", wifi: "Wi-Fi", note: "Eslatmalar", key: "Kalitlar", other: "Boşqa" };
 
   function strength(pw) {
     let s = 0;
@@ -700,6 +950,7 @@
     V.dek = await importDek(dekRaw);
     dekRaw.fill(0);
     await loadKeys();
+    await ensureKeyPair().catch((e) => console.error("keypair", e));
     return rk;
   }
   async function rawDekByPassword(password) {
@@ -728,11 +979,14 @@
     V.dek = await importDek(dekRaw);
     dekRaw.fill(0);
     V.last = Date.now();
+    await ensureKeyPair().catch((e) => console.error("keypair", e));
     await loadItems();
+    if (cur === "files") loadFiles().catch(() => {});
   }
   function lock(silent) {
     if (!V.dek) return;
-    V.dek = null; V.items = [];
+    V.dek = null; V.items = []; V.priv = null;
+    F.list = null; F.metas.clear(); F.keys.clear(); for (const u of F.urls.values()) URL.revokeObjectURL(u); F.urls.clear();
     closeSheet();
     renderVault(); if (cur === "files") renderFiles();
     if (!silent) toast("Seyf qulflandi");
@@ -753,8 +1007,19 @@
   // ------------------------------------------------ yozuvlar
   async function loadItems() {
     const r = await api("/vault/items");
-    const out = [];
+    const out = [], migrate = [];
     for (const it of r.items) {
+      if (String(it.data).startsWith("pk1.")) {
+        // botga tashlangan matn: yopiq kalit bilan ochamiz va odatdagi (DEK) shifrga o'tkazamiz
+        try {
+          if (!V.priv) throw new Error("priv");
+          const env = JSON.parse(td.decode(B64.dec(it.data.slice(4))));
+          const f = fieldsFromDrop(env.k, td.decode(await pkOpen(env.t)), td.decode(await pkOpen(env.n)));
+          out.push({ id: it.id, kind: it.kind, f, updated_at: it.updated_at, fromBot: true });
+          migrate.push({ id: it.id, kind: it.kind, f });
+        } catch (_) { out.push({ id: it.id, kind: it.kind, f: { title: "⚠️ Botdan kelgan yozuv oçilmadi" }, broken: true, updated_at: it.updated_at }); }
+        continue;
+      }
       try {
         const data = JSON.parse(td.decode(await unseal(V.dek, B64.dec(it.data), "qq:item:" + it.kind)));
         out.push({ id: it.id, kind: it.kind, f: data.f || {}, updated_at: it.updated_at });
@@ -762,6 +1027,12 @@
     }
     V.items = out;
     renderVault();
+    for (const m of migrate) {
+      try {
+        const data = B64.enc(await seal(V.dek, te.encode(JSON.stringify({ v: 1, f: m.f })), "qq:item:" + m.kind));
+        await api("/vault/item", { method: "POST", body: { id: m.id, kind: m.kind, data } });
+      } catch (e) { console.error("migrate", e); }
+    }
   }
   async function saveItem(kind, f, id) {
     const data = B64.enc(await seal(V.dek, te.encode(JSON.stringify({ v: 1, f })), "qq:item:" + kind));
@@ -785,14 +1056,18 @@
     const chips = el("div", { class: "chips" },
       el("button", { class: "chip" + (V.filter === "all" ? " on" : ""), onclick: () => { V.filter = "all"; renderVault(); } }, `Barçasi ${V.items.length}`),
       Object.entries(TYPES).filter(([k]) => counts[k]).map(([k, t]) =>
-        el("button", { class: "chip" + (V.filter === k ? " on" : ""), onclick: () => { V.filter = k; renderVault(); } }, `${t.ic} ${counts[k]}`)));
+        el("button", { class: "chip" + (V.filter === k ? " on" : ""), onclick: () => { V.filter = k; renderVault(); } }, `${t.ic} ${SHORT[k] || t.name} ${counts[k]}`)));
     const top = el("div", null, el("div", { class: "bar2", style: "margin-top:4px" }, search,
       el("button", { class: "icon-btn", "aria-label": "Qulflaş", onclick: () => lock() }, "🔒")),
-      V.keys.has_transfer ? null : el("div", { class: "warn", style: "margin-top:10px" },
-        "⚠️ Telegram akkauntingiz yöqolsa seyfni köçiriş uçun yangi tiklaş kaliti yarating: ⚙️ → Yangi tiklaş kaliti."));
+      V.keys.login ? null : el("button", { class: "warn", style: "margin-top:10px;width:100%", onclick: loginSetup },
+        "👤 Seyf uçun login tanlang — boşqa Telegram akkauntdan kiriş va pasport bilan parolni tiklaş uçun kerak. Bosing →"),
+      V.keys.login && !V.keys.has_idrec ? el("button", { class: "info", style: "margin-top:10px;width:100%;text-align:left", onclick: idrecSetup },
+        "🪪 Parolni unutsangiz: pasport ma'lumotlari bilan login va parolni qaytariş imkonini yoqing. Bosing →") : null,
+      V.keys.login && V.keys.has_idrec && !V.keys.has_face ? el("button", { class: "info", style: "margin-top:10px;width:100%;text-align:left", onclick: faceSetup },
+        "🙂 Yuz bilan tiklaşni ham yoqing — kamera bilan login va parolni qaytariş. Bosing →") : null);
     if (!V.items.length) {
       return box.replaceChildren(top, el("div", { class: "empty" }, el("div", { style: "font-size:40px" }, "🔐"), el("h2", null, "Seyf böş"),
-        el("div", null, "Pastdagi + tugmasi bilan parol, login, kripto hamyon, karta yoki hujjat qöşing. Hammasi telefoningizda şifrlanadi."),
+        el("div", null, "Pastdagi + tugmasi bilan parol, login, kripto hamyon, karta yoki hujjat qöşing. Hammasi telefoningizda şifrlanadi. Yoki istalgan matn, rasm, video va faylni botga taşlang — özi şifrlanib, şu yerda bölimlarga joylanadi."),
         el("br"), el("button", { class: "cta", onclick: chooseType }, "+ Birinçi yozuv")));
     }
     box.replaceChildren(top, chips, el("div", { class: "list" }, items.map((i) =>
@@ -803,6 +1078,7 @@
   }
 
   function setupView() {
+    const lg = el("input", { class: "inp", placeholder: "Login (masalan: durmon01)", autocomplete: "off", autocapitalize: "none", spellcheck: "false" });
     const p1 = pwField("mp1", "Master parol (kamida 10 belgi)");
     const p2 = pwField("mp2", "Master parolni takrorlang");
     const meter = el("b");
@@ -810,22 +1086,35 @@
     const btn = el("button", { class: "btn" }, "Seyfni yaratiş");
     btn.onclick = async () => {
       const a = p1.inp.value, b = p2.inp.value;
+      const login = normLogin(lg.value);
+      if (!login) return toast("Login: 3–32 belgi, lotin harf, raqam, nuqta yoki _");
       if (a.length < 10) return toast("Master parol kamida 10 belgi bölsin");
       if (strength(a) < 2) return toast("Parol juda oddiy: harf, raqam va belgi aralaştiring");
       if (a !== b) return toast("Parollar bir xil emas");
       const done = busy(btn, "Şifrlanmoqda…");
-      try { const rk = await createVault(a); p1.inp.value = p2.inp.value = ""; showRecoveryKey(rk, true); }
+      try {
+        const rk = await createVault(a);
+        try { await setLogin(login, a); } catch (e) { toast(e.message === "login_taken" ? "Bu login band — Sozlamalarda boşqasini tanlang" : "Loginni saqlab bölmadi"); }
+        p1.inp.value = p2.inp.value = ""; showRecoveryKey(rk, true);
+      }
       catch (e) { console.error("vault create", e); done(); toast(e.message === "exists" ? "Seyf allaqaçon yaratilgan" : "Yaratib bölmadi"); }
     };
     return el("div", { class: "lockbox" },
       el("div", { class: "big" }, "🔐"), el("h2", null, "Şaxsiy seyfni yarating"),
       el("p", null, "Parollar, loginlar, kripto hamyonlar, karta va hujjat ma'lumotlari master parol bilan şu telefonda şifrlanadi. Uni hec kim — hatto Qora Quti ham — oça olmaydi."),
+      el("div", { class: "fld", style: "text-align:left" }, el("div", { class: "lbl" }, "Login — boşqa akkauntdan kiriş uçun"), lg),
       el("div", { class: "fld", style: "text-align:left" }, p1.row, el("div", { class: "strength" }, meter)),
       el("div", { class: "fld", style: "text-align:left" }, p2.row),
       el("div", { class: "warn" }, "⚠️ Master parolni unutsangiz, uni faqat tiklaş kaliti bilan qaytarasiz. Ikkalasi ham yöqolsa, ma'lumotni hec kim oça olmaydi."),
       btn,
       el("div", { class: "note", style: "margin:22px 0 4px" }, "Avval boşqa Telegram akkauntda seyfingiz bor edimi?"),
-      el("button", { class: "btn sec", onclick: transferFlow }, "♻️ Eski seyfimni tiklaş"));
+      el("button", { class: "btn sec", onclick: () => openSheet(el("h3", null, "♻️ Eski seyfni tiklaş"),
+        el("button", { class: "btn", onclick: () => loginSignInFlow() }, "👤 Login va master parol bilan kiriş"),
+        el("button", { class: "btn sec", onclick: idRecoverFlow }, "🪪 Parolni unutdim — pasport ma'lumotlari bilan"),
+        el("button", { class: "btn sec", onclick: () => faceRecoverFlow() }, "🙂 Parolni unutdim — yuz bilan"),
+        el("button", { class: "btn sec", onclick: transferFlow }, "🗝 Tiklaş kaliti bilan"),
+        el("button", { class: "btn sec", onclick: () => emailRecoverFlow() }, "📧 Gmail va şaxsiy ma'lumotlar bilan")) }, "♻️ Eski seyfimni tiklaş"),
+      V.transfer && V.transfer.email_done ? el("div", { class: "info", style: "margin-top:12px" }, "Tiklaş tayyor bölsa, seyf şu akkauntga köçirilgan bölişi kerak. Sahifani yangilang.") : null);
   }
 
   function showRecoveryKey(rk, first) {
@@ -854,12 +1143,578 @@
     };
     btn.onclick = go;
     p.inp.onkeydown = (e) => { if (e.key === "Enter") go(); };
-    setTimeout(() => p.inp.focus(), 50);
+    const bioBtn = el("button", { class: "btn", hidden: true }, "😊 Face ID bilan oçiş");
+    bioBtn.onclick = async () => { const done = busy(bioBtn, "Tekşirilmoqda…"); const okb = await bioUnlock(); if (!okb) done(); };
+    const faceBtn = el("button", { class: "btn", hidden: true }, "🙂 Yuz bilan oçiş");
+    faceBtn.onclick = async () => { const done = busy(faceBtn, "Kamera…"); const okf = await faceUnlock(); if (!okf) done(); };
+    faceUnlockReady().then((v) => { if (v && !V.dek) faceBtn.hidden = false; });
+    bioReady().then((st) => {
+      if (!st || V.dek) { setTimeout(() => p.inp.focus(), 50); return; }
+      bioBtn.hidden = false; bioBtn.textContent = "😊 " + (bioName(st.bm) === "Face ID" ? "Face ID" : "Barmoq izi") + " bilan oçiş";
+      if (!V.bioTried) { V.bioTried = true; bioBtn.click(); }
+    });
     return el("div", { class: "lockbox" },
       el("div", { class: "big" }, "🔒"), el("h2", null, "Seyf qulflangan"),
       el("p", null, "Oçiş uçun master parolni kiriting."),
-      p.row, btn,
-      el("button", { class: "btn sec", onclick: recoverFlow }, "Parolni unutdim"));
+      bioBtn, faceBtn, p.row, btn,
+      V.transfer && V.transfer.pending ? el("div", { class: "info", style: "margin-top:12px" },
+        `⏳ Tiklaş so'rovi bor: ${fmtDate(V.transfer.ready_at)} da oçiladi.`) : null,
+      V.transfer && V.transfer.email_done ? el("button", { class: "btn", style: "margin-top:12px", onclick: emailFinishFlow }, "📧 Tiklaş tayyor — seyfni oçiş") : null,
+      el("button", { class: "btn sec", onclick: forgotChoice }, "Parolni unutdim"));
+  }
+
+  function forgotChoice() {
+    openSheet(el("h3", null, "Qanday tiklaymiz?"),
+      V.keys.has_idrec ? el("button", { class: "btn", onclick: idRecoverFlow }, "🪪 Pasport ma'lumotlari bilan (login va parolni körsatadi)") : null,
+      V.keys.has_face ? el("button", { class: "btn", onclick: () => faceRecoverFlow(V.keys.login) }, "🙂 Yuz bilan (login va parolni körsatadi)") : null,
+      el("button", { class: "btn sec", onclick: recoverFlow }, "🗝 Tiklaş kaliti bilan"),
+      V.keys.email_ready ? el("button", { class: "btn sec", onclick: () => emailRecoverFlow() }, "📧 Gmail va şaxsiy ma'lumotlar bilan") : null,
+      el("div", { class: "note", style: "margin-top:12px" }, "Gmail usuli faqat oldindan yoqilgan bölsa işlaydi va 7 kun kutişni talab qiladi."));
+  }
+
+
+  // ---------------- Login: tanlash yoki o'zgartirish (seyf ochiq bo'lganda)
+  function loginSetup() {
+    const lg = el("input", { class: "inp", placeholder: "masalan: durmon01", autocomplete: "off", autocapitalize: "none", spellcheck: "false", value: V.keys.login || "" });
+    const pw = pwField("ls0", "Master parol");
+    const b = el("button", { class: "btn" }, "Saqlaş");
+    b.onclick = async () => {
+      const login = normLogin(lg.value);
+      if (!login) return toast("Login: 3–32 belgi, lotin harf, raqam, nuqta yoki _");
+      const done = busy(b, "Tekşirilmoqda…");
+      let raw; try { raw = await rawDekByPassword(pw.inp.value); raw.fill(0); } catch (_) { done(); return toast("Master parol notöğri"); }
+      try {
+        await setLogin(login, pw.inp.value);
+        await refreshIdBlob(login, pw.inp.value);
+        await refreshFaceBlob(login, pw.inp.value);
+        pw.inp.value = ""; closeSheet(); renderVault(); toast("Login saqlandi: " + login);
+      } catch (e) { done(); toast(e.message === "login_taken" ? "Bu login band, boşqasini tanlang" : "Saqlab bölmadi"); }
+    };
+    openSheet(el("h3", null, "👤 Seyf logini"),
+      el("div", { class: "info", style: "margin-bottom:12px" }, "Telefon yoki Telegram akkaunt yöqolsa, istalgan boşqa akkauntdan şu login va master parol bilan kirasiz — seyf öşa akkauntga köçadi."),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Login"), lg),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Master parol (tasdiqlaş uçun)"), pw.row), b);
+  }
+
+  // ---------------- Pasport bilan tiklashni yoqish (seyf ochiq bo'lganda)
+  function idrecSetup() {
+    if (!V.keys.login) return loginSetup();
+    const form = idForm();
+    const pw = pwField("id0", "Master parol");
+    const b = el("button", { class: "btn" }, "Yoqiş");
+    b.onclick = async () => {
+      let a; try { a = form.read(); } catch (e) { return toast(e.message); }
+      const done = busy(b, "Şifrlanmoqda… (bir necha soniya)");
+      let raw; try { raw = await rawDekByPassword(pw.inp.value); raw.fill(0); } catch (_) { done(); return toast("Master parol notöğri"); }
+      try {
+        const { d, lookup } = await idDerive(a);
+        const pepper = B64.enc(rand(32));
+        const key = await idKeyRaw(d, pepper);
+        const body = { lookup, pepper, blob: await idBlob(key, V.keys.login, pw.inp.value), idkey_wrapped: B64.enc(await seal(V.dek, key, "qq:idkey")) };
+        key.fill(0);
+        await api("/idrec/save", { method: "POST", body });
+        form.clear(); pw.inp.value = "";
+        await loadKeys(); closeSheet(); renderVault(); toast("🪪 Pasport bilan tiklaş yoqildi");
+      } catch (e) {
+        done();
+        toast({ taken: "Bu ma'lumotlar boşqa seyfga bog'langan", no_login: "Avval login tanlang" }[e.message] || "Saqlab bölmadi");
+      }
+    };
+    openSheet(el("h3", null, "🪪 Pasport ma'lumotlari bilan tiklaş"),
+      el("div", { class: "info", style: "margin-bottom:12px" },
+        "Master parolni unutsangiz, şu ma'lumotlarni kiritib login va parolingizni qaytarasiz — istalgan Telegram akkauntdan. Ma'lumotlar şu telefonda kalitga aylanadi: serverga oçiq holda yuborilmaydi va saqlanmaydi. Pasportdagidek yozing."),
+      ...form.rows,
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Master parol (tasdiqlaş uçun)"), pw.row),
+      el("div", { class: "warn" }, "⚠️ Pasport ma'lumotlaringizni biladigan odam ham parolni ola olişi mumkin. Har gal körilganda Telegram'ga xabar boradi."),
+      b);
+  }
+
+  // ---------------- Pasport ma'lumotlari bilan login va parolni qaytarish (istalgan akkauntdan)
+  function idRecoverFlow() {
+    const form = idForm();
+    const b = el("button", { class: "btn" }, "Tekşiriş");
+    b.onclick = async () => {
+      let a; try { a = form.read(); } catch (e) { return toast(e.message); }
+      const done = busy(b, "Tekşirilmoqda… (bir necha soniya)");
+      try {
+        const { d, lookup } = await idDerive(a);
+        const r = await api("/idrec/recover", { method: "POST", body: { lookup } });
+        const key = await idKeyRaw(d, r.pepper);
+        const data = JSON.parse(td.decode(await unseal(await importDek(key), B64.dec(r.blob), "qq:idrec")));
+        key.fill(0); form.clear();
+        showCreds(data.login, data.password, r.same);
+      } catch (e) {
+        done();
+        toast({ wrong: "Ma'lumotlar mos kelmadi. Pasportdagidek yozilganini tekşiring", rate: "Juda köp urinish. 24 soatdan keyin qayta urinib köring" }[e.message] || "Tekşirib bölmadi");
+      }
+    };
+    openSheet(el("h3", null, "🪪 Parolni tiklaş"),
+      el("div", { class: "info", style: "margin-bottom:12px" }, "Seyfga ulangan pasport ma'lumotlarini kiriting. Töğri bölsa, login va master parol körsatiladi. Ma'lumotlar serverga oçiq yuborilmaydi."),
+      ...form.rows, b);
+  }
+  function showCreds(login, password, same) {
+    const val = el("div", { class: "val mono" }, "••••••••••");
+    const eye = el("button", { class: "mini", onclick: () => { const sh = val.textContent !== "••••••••••"; val.textContent = sh ? "••••••••••" : password; eye.textContent = sh ? "👁" : "🙈"; } }, "👁");
+    const acts = [];
+    if (!V.keys || !V.keys.exists) acts.push(el("button", { class: "btn", onclick: () => loginSignInFlow(login, password) }, "➡️ Şu akkauntda seyfni oçiş"));
+    else if (same && !V.dek) acts.push(el("button", { class: "btn", onclick: async (e) => {
+      const done = busy(e.currentTarget, "Oçilmoqda…");
+      try { const raw = await rawDekByPassword(password); await unlockWith(raw); closeSheet(); toast("Seyf oçildi"); } catch (_) { done(); toast("Oçib bölmadi"); }
+    } }, "🔓 Seyfni oçiş"));
+    openSheet(el("h3", null, "✅ Topildi"),
+      el("div", { class: "vf" }, el("div", { class: "grow" }, el("div", { class: "lbl" }, "Login"), el("div", { class: "val mono" }, login)),
+        el("div", { class: "acts" }, el("button", { class: "mini", onclick: () => copy(login, "Login") }, "📋"))),
+      el("div", { class: "vf" }, el("div", { class: "grow" }, el("div", { class: "lbl" }, "Master parol"), val),
+        el("div", { class: "acts" }, eye, el("button", { class: "mini", onclick: () => copy(password, "Parol") }, "📋"))),
+      el("div", { class: "warn" }, "Parolni eslab qoling yoki xavfsiz joyga yozing. Kerak bölsa, seyfni oçib uni özgartiring."),
+      ...acts);
+  }
+
+  // ---------------- Login + master parol bilan kirish (yangi akkauntda — seyf shu akkauntga ko'chadi)
+  function loginSignInFlow(preLogin, prePass) {
+    const lg = el("input", { class: "inp", placeholder: "Login", autocomplete: "username", autocapitalize: "none", spellcheck: "false", value: preLogin || "" });
+    const pw = pwField("li0", "Master parol");
+    if (prePass) pw.inp.value = prePass;
+    const b = el("button", { class: "btn" }, "Kiriş");
+    b.onclick = async () => {
+      const login = normLogin(lg.value);
+      if (!login || !pw.inp.value) return toast("Login va parolni kiriting");
+      const done = busy(b, "Tekşirilmoqda…");
+      try {
+        const s1 = await api("/auth/salt", { method: "POST", body: { login } });
+        const proof = await pbkdfHex(pw.inp.value, B64.dec(s1.salt), s1.iterations || ITER);
+        await api("/auth/login", { method: "POST", body: { login, proof } });
+        await loadKeys();
+        const raw = await rawDekByPassword(pw.inp.value);
+        pw.inp.value = "";
+        await unlockWith(raw);
+        closeSheet(); renderVault(); toast("✅ Seyf şu akkauntga köçirildi va oçildi");
+      } catch (e) {
+        done();
+        toast({ wrong: "Login yoki parol notöğri", rate: "Juda köp urinish. Keyinroq qayta urinib köring", has_vault: "Bu akkauntda boşqa seyf bor" }[e.message] || "Kirib bölmadi");
+      }
+    };
+    openSheet(el("h3", null, "👤 Login bilan kiriş"),
+      el("div", { class: "info", style: "margin-bottom:12px" }, "Eski seyfingiz logini va master parolini kiriting. Seyf (yozuvlar, fayllar, kanal arxivi) şu Telegram akkauntga köçadi, eski akkauntga xabar boradi."),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Login"), lg),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Master parol"), pw.row), b,
+      el("button", { class: "btn sec", onclick: idRecoverFlow }, "Parolni unutdim"));
+  }
+
+
+  // ============================================================ YUZ va BIOMETRIYA
+  // 1) Face ID / barmoq izi bilan ochish: tasodifiy kalit Telegram'ning biometrik xotirasida, serverda shu kalit bilan o'ralgan DEK.
+  const BM = () => (tg && tg.BiometricManager && tg.isVersionAtLeast && tg.isVersionAtLeast("7.2")) ? tg.BiometricManager : null;
+  let bmReady = null;
+  function bmInit() {
+    const bm = BM();
+    if (!bm) return Promise.resolve(null);
+    if (!bmReady) bmReady = new Promise((res) => { try { bm.init(() => res(bm)); } catch (_) { res(null); } setTimeout(() => res(bm.isInited ? bm : null), 3000); });
+    return bmReady;
+  }
+  const bioName = (bm) => bm && bm.biometricType === "finger" ? "barmoq izi" : "Face ID";
+  async function bioAvailable() { const bm = await bmInit(); return bm && bm.isBiometricAvailable ? bm : null; }
+  async function bioEnable() {
+    const bm = await bioAvailable();
+    if (!bm) return toast("Bu telefonda Face ID / barmoq izi Telegram orqali mavjud emas");
+    if (!V.dek) return toast("Avval seyfni oçing");
+    if (!bm.isAccessGranted) {
+      const ok = await new Promise((r) => bm.requestAccess({ reason: "Qora Qutini " + bioName(bm) + " bilan oçiş uçun" }, r));
+      if (!ok) return toast("Ruxsat berilmadi. Telegram sozlamalaridan yoqing");
+    }
+    // Joriy DEK eksport qilinmaydi (xavfsizlik), shuning uchun bir marta master parol so'raymiz
+    const pw = pwField("bio0", "Master parol");
+    const b = el("button", { class: "btn" }, "Yoqiş");
+    b.onclick = async () => {
+      const done = busy(b, "Tekşirilmoqda…");
+      let dek; try { dek = await rawDekByPassword(pw.inp.value); } catch (_) { done(); return toast("Master parol notöğri"); }
+      try {
+        const key = rand(32);
+        const wrapped = B64.enc(await seal(await importDek(key.slice()), dek, "qq:bio"));
+        dek.fill(0);
+        const saved = await new Promise((r) => bm.updateBiometricToken(B64.enc(key), r));
+        key.fill(0);
+        if (!saved) throw new Error("token");
+        await api("/bio/save", { method: "POST", body: { device_id: bm.deviceId, wrapped } });
+        pw.inp.value = ""; closeSheet(); toast("😊 " + bioName(bm) + " bilan oçiş yoqildi");
+      } catch (_) { done(); toast("Yoqib bölmadi"); }
+    };
+    openSheet(el("h3", null, "😊 " + bioName(bm) + " bilan oçiş"),
+      el("div", { class: "info", style: "margin-bottom:12px" }, "Keyingi safar seyfni master parol yozmasdan, " + bioName(bm) + " bilan oçasiz. Kalit faqat şu telefonning xavfsiz xotirasida turadi — yuzingiz yoki barmoq izingiz hec qayerga yuborilmaydi."),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Master parol (bir marta)"), pw.row), b);
+  }
+  async function bioDisable() {
+    const bm = await bmInit();
+    try { if (bm) await new Promise((r) => bm.updateBiometricToken("", r)); } catch (_) {}
+    await api("/bio/delete", { method: "POST", body: bm && bm.deviceId ? { device_id: bm.deviceId } : { all: true } }).catch(() => {});
+    toast("Öçirildi");
+  }
+  async function bioReady() {
+    const bm = await bioAvailable();
+    if (!bm || !bm.isAccessGranted || !bm.isBiometricTokenSaved || !V.keys || !V.keys.exists) return null;
+    try { const r = await api(`/bio/get?device=${encodeURIComponent(bm.deviceId)}`); return r.wrapped ? { bm, wrapped: r.wrapped } : null; } catch (_) { return null; }
+  }
+  async function bioUnlock() {
+    const st = await bioReady();
+    if (!st) return false;
+    const token = await new Promise((r) => st.bm.authenticate({ reason: "Qora Qutini oçiş" }, (ok, t) => r(ok ? t : null)));
+    if (!token) return false;
+    try {
+      const raw = await unseal(await importDek(B64.dec(token)), B64.dec(st.wrapped), "qq:bio");
+      await unlockWith(raw);
+      return true;
+    } catch (_) { toast(bioName(st.bm) + " kaliti eskirgan — master parol bilan kiring"); return false; }
+  }
+
+  // 2) Yuz bilan tiklash: kamera → jonlilik tekshiruvi (to'g'ri, chapga, o'ngga) → 128 sonli yuz andozasi (face-api, telefonda)
+  const FACE_JS = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/dist/face-api.js";
+  const FACE_MODELS = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/model";
+  let faceLib = null;
+  async function loadFace() {
+    if (faceLib) return faceLib;
+    if (!window.faceapi) await new Promise((res, rej) => { const sc = document.createElement("script"); sc.src = FACE_JS; sc.onload = res; sc.onerror = () => rej(new Error("face_load")); document.head.append(sc); });
+    const fa = window.faceapi;
+    if (!(await fa.tf.setBackend("webgl").catch(() => false))) await fa.tf.setBackend("cpu");
+    await fa.tf.ready();
+    await Promise.all([fa.nets.tinyFaceDetector.loadFromUri(FACE_MODELS), fa.nets.faceLandmark68Net.loadFromUri(FACE_MODELS), fa.nets.faceRecognitionNet.loadFromUri(FACE_MODELS)]);
+    faceLib = fa;
+    return fa;
+  }
+  const fdist = (a, b) => Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0));
+  // Bosh holati 68 nuqtadan: yaw (chap/o'ng) va pitch (tepa/past). Kamera kadri ko'zgulanmagan:
+  // odam o'z CHAPiga qarasa, burun rasmda o'ngga siljiydi → yaw > 0.
+  function poseOf(lm) {
+    const p = lm.positions, le = p[36], re = p[45], n = p[30], chin = p[8];
+    const eyeY = (p[36].y + p[39].y + p[42].y + p[45].y) / 4, eyeX = (le.x + re.x) / 2;
+    return { yaw: (n.x - eyeX) / Math.max(1, re.x - le.x), pitch: (n.y - eyeY) / Math.max(1, chin.y - eyeY) };
+  }
+  function avgDesc(list) { const out = new Array(128).fill(0); for (const d of list) for (let i = 0; i < 128; i++) out[i] += d[i] / list.length; return out; }
+  const MOVE_TEXT = { up: "⬆️ Tepaga qarang", down: "⬇️ Pastga qarang", left: "⬅️ Çapga qarang", right: "➡️ Önga qarang" };
+
+  /**
+   * Jonlilik tekshiruvi (holat mashinasi, kameradan mustaqil — sinovlanadi):
+   * 3 ta to'g'ri kadr → tasodifiy tartibda tepaga/pastga/chapga/o'ngga (har biridan keyin yana to'g'ri) → oxirgi to'g'ri kadr.
+   * Oddiy rasm boshini burolmaydi; oldindan yozilgan video tasodifiy tartibga mos kelmaydi; har harakat 12 soniyada bo'lishi kerak.
+   * Har kadrdagi yuz boshidagi yuz bilan bir xil bo'lishi shart (boshqa odam yoki rasm almashtirilsa — to'xtaydi).
+   */
+  function makeLiveness(order, now = () => Date.now()) {
+    const st = { stage: "base", base: [], pitch0: 0, i: 0, need: order.slice(), t: now(), done: false, fail: null };
+    const center = (q) => Math.abs(q.yaw) < 0.12 && Math.abs(q.pitch - st.pitch0) < Math.max(0.04, st.pitch0 * 0.1);
+    const hit = (m, q) => m === "left" ? q.yaw > 0.22 : m === "right" ? q.yaw < -0.22
+      : m === "up" ? q.pitch < st.pitch0 * 0.82 && Math.abs(q.yaw) < 0.25 : q.pitch > st.pitch0 * 1.18 && Math.abs(q.yaw) < 0.25;
+    function text() {
+      if (st.stage === "base") return "Yuzingizni doira içiga oling va töğriga qarang";
+      if (st.stage === "move") return MOVE_TEXT[st.need[st.i]];
+      if (st.stage === "center") return "Endi yana töğriga qarang";
+      return "";
+    }
+    function step(q, d) {
+      if (st.done || st.fail) return st;
+      if (now() - st.t > 12000) { st.fail = "timeout"; return st; }
+      if (st.base.length >= 3 && fdist(d, avgDesc(st.base)) > 0.6) return st; // boshqa yuz — kadr hisoblanmaydi
+      if (st.stage === "base") {
+        if (Math.abs(q.yaw) < 0.1) { st.base.push(d); st.pitch0 = (st.pitch0 * (st.base.length - 1) + q.pitch) / st.base.length; }
+        if (st.base.length >= 3) { st.stage = "move"; st.t = now(); }
+      } else if (st.stage === "move") {
+        if (hit(st.need[st.i], q)) { st.i++; st.stage = "center"; st.t = now(); }
+      } else if (st.stage === "center") {
+        if (center(q)) {
+          if (st.i >= st.need.length) {
+            if (fdist(d, avgDesc(st.base)) > 0.45) return st;
+            st.final = avgDesc([...st.base, d]); st.done = true;
+          } else { st.stage = "move"; st.t = now(); }
+        }
+      }
+      return st;
+    }
+    return { st, step, text };
+  }
+  window.__qqLive = makeLiveness; // sinov uchun
+  function shuffled(a) { const r = crypto.getRandomValues(new Uint32Array(a.length)); return a.map((x, i) => [r[i], x]).sort((p, q) => p[0] - q[0]).map((x) => x[1]); }
+
+  /** Jonli yuz tekshiruvi. Natija: 128 sonli andoza (o'rtacha) yoki xato. */
+  function faceCapture(title, hint) {
+    if (window.__qqFaceMock) return window.__qqFaceMock();
+    return new Promise((resolve, reject) => {
+      const video = el("video", { autoplay: true, playsinline: true, muted: true });
+      const ring = el("div", { class: "ring" });
+      const msg = el("div", { class: "info", style: "text-align:center;font-size:17px;font-weight:600;color:var(--text)" }, "Model yuklanmoqda… (bir marta, ~7 MB)");
+      const steps = el("div", { class: "steps" }, [0, 1, 2, 3].map(() => el("i")));
+      let stream = null, stopped = false, timer = null;
+      const stop = () => { stopped = true; clearInterval(timer); if (stream) stream.getTracks().forEach((t) => t.stop()); };
+      const cancel = el("button", { class: "btn sec" }, "Bekor qiliş");
+      cancel.onclick = () => { stop(); closeSheet(); reject(new Error("cancel")); };
+      openSheet(el("h3", null, title), hint ? el("div", { class: "note", style: "margin:-6px 0 10px" }, hint) : null,
+        el("div", { class: "cam" }, video, ring), steps, msg, cancel);
+      (async () => {
+        let fa;
+        try {
+          [fa, stream] = await Promise.all([loadFace(), navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 640 } }, audio: false })]);
+        } catch (e) {
+          stop(); closeSheet();
+          return reject(new Error(e && e.message === "face_load" ? "face_load" : "camera"));
+        }
+        if (stopped) { stream.getTracks().forEach((t) => t.stop()); return; }
+        video.srcObject = stream;
+        const live = makeLiveness(shuffled(["up", "down", "left", "right"]));
+        msg.textContent = live.text();
+        let busyF = false;
+        const opts = new fa.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.5 });
+        timer = setInterval(async () => {
+          if (busyF || stopped || video.readyState < 2) return;
+          busyF = true;
+          try {
+            const r = await fa.detectSingleFace(video, opts).withFaceLandmarks().withFaceDescriptor();
+            if (!r || r.detection.score < 0.6) { ring.classList.remove("ok"); if (Date.now() - live.st.t > 12000) live.st.fail = "timeout"; }
+            else { ring.classList.add("ok"); live.step(poseOf(r.landmarks), Array.from(r.descriptor)); }
+            [...steps.children].forEach((x, i) => x.classList.toggle("on", i < live.st.i));
+            msg.textContent = live.text();
+            if (live.st.fail) { stop(); closeSheet(); reject(new Error(live.st.fail)); }
+            else if (live.st.done) { stop(); closeSheet(); resolve(live.st.final); }
+          } catch (_) { /* keyingi kadr */ } finally { busyF = false; }
+        }, 200);
+      })();
+    });
+  }
+
+  // 3) Android (va kompyuter): selfi bilan ochish. Kalit = SHA256(telefondagi yarim || serverdagi yarim).
+  //    Serverdagi yarim faqat jonli yuz mos kelganda beriladi: telefonsiz ham, yuzsiz ham, oddiy rasm bilan ham ochilmaydi.
+  const IS_IOS = (tg && /ios/i.test(tg.platform || "")) || /iPhone|iPad|iPod/.test(navigator.userAgent);
+  const fuGet = () => { try { const v = JSON.parse(localStorage.getItem("qq_fu") || "null"); return v && state.me && v.uid === state.me.user.id ? v : null; } catch (_) { return null; } };
+  const fuKey = async (lB64, sB64) => {
+    const a = B64.dec(lB64), b = B64.dec(sB64), m = new Uint8Array(a.length + b.length); m.set(a); m.set(b, a.length);
+    return importDek(new Uint8Array(await crypto.subtle.digest("SHA-256", m)));
+  };
+  async function faceUnlockReady() {
+    const v = fuGet();
+    if (!v || !V.keys || !V.keys.exists) return null;
+    try { const r = await api(`/faceunlock/has?device=${encodeURIComponent(v.dev)}`); return r.has ? v : null; } catch (_) { return null; }
+  }
+  function faceUnlockEnroll() {
+    if (!V.dek) return toast("Avval seyfni oçing");
+    const pw = pwField("fu0", "Master parol");
+    const b = el("button", { class: "btn" }, "📷 Yuzni skanerlaş");
+    b.onclick = async () => {
+      const done = busy(b, "Tekşirilmoqda…");
+      let dek; try { dek = await rawDekByPassword(pw.inp.value); } catch (_) { done(); return toast("Master parol notöğri"); }
+      pw.inp.value = "";
+      let desc;
+      try { desc = await faceCapture("🙂 Yuz bilan oçişni sozlaş", "Aytilgan tomonga sekin qarang: tepaga, pastga, çapga, önga"); }
+      catch (e) { dek.fill(0); const t = faceErr(e); if (t) toast(t); return; }
+      try {
+        const v = { uid: state.me.user.id, dev: "fu-" + toHex(rand(12)), l: B64.enc(rand(32)) };
+        const skey = B64.enc(rand(32));
+        const wrapped = B64.enc(await seal(await fuKey(v.l, skey), dek, "qq:fu"));
+        dek.fill(0);
+        await api("/faceunlock/save", { method: "POST", body: { device_id: v.dev, descriptor: desc, skey, wrapped } });
+        localStorage.setItem("qq_fu", JSON.stringify(v));
+        closeSheet(); toast("🙂 Endi seyfni yuzingiz bilan oçasiz");
+      } catch (_) { toast("Saqlab bölmadi"); }
+    };
+    openSheet(el("h3", null, "🙂 Yuz bilan oçiş (selfi)"),
+      el("div", { class: "info", style: "margin-bottom:12px" },
+        "Seyfni oçişda kamera yoqiladi: tasodifiy tartibda tepaga, pastga, çapga, önga qaraysiz. Oddiy rasm yoki oldindan yozilgan video bilan oçilmaydi. Kalitning yarmi şu telefonda, yarmi serverda — boşqa telefondan yoki yuzsiz oçilmaydi."),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Master parol (bir marta)"), pw.row), b);
+  }
+  async function faceUnlock() {
+    const v = fuGet();
+    if (!v) return false;
+    let desc;
+    try { desc = await faceCapture("🙂 Yuz bilan oçiş"); }
+    catch (e) { const t = faceErr(e); if (t) toast(t); return false; }
+    try {
+      const r = await api("/faceunlock/verify", { method: "POST", body: { device_id: v.dev, descriptor: desc } });
+      const raw = await unseal(await fuKey(v.l, r.skey), B64.dec(r.wrapped), "qq:fu");
+      await unlockWith(raw);
+      return true;
+    } catch (e) {
+      toast({ wrong: "Yuz mos kelmadi — master parol bilan kiring", rate: "Juda köp urinish — master parol bilan kiring", not_found: "Yuz bilan oçiş öçirilgan" }[e.message] || "Oçib bölmadi");
+      return false;
+    }
+  }
+  async function faceUnlockDisable() {
+    const v = fuGet();
+    await api("/faceunlock/delete", { method: "POST", body: v ? { device_id: v.dev } : { all: true } }).catch(() => {});
+    try { localStorage.removeItem("qq_fu"); } catch (_) {}
+    toast("Öçirildi");
+  }
+
+  const faceErr = (e) => ({ camera: "Kameraga ruxsat berilmadi yoki kamera topilmadi", face_load: "Yuz modelini yuklab bölmadi — internetni tekşiring",
+    timeout: "Harakat vaqtida bajarilmadi — yorug' joyda, aytilgan tomonga sekin qarab qayta urinib köring", cancel: "" })[e && e.message];
+
+  async function refreshFaceBlob(login, password) {
+    if (!V.keys || !V.keys.has_face || !V.keys.fkey_wrapped || !V.dek) return;
+    const raw = await unseal(V.dek, B64.dec(V.keys.fkey_wrapped), "qq:fkey");
+    await api("/face/update", { method: "POST", body: { blob: await idBlob(raw, login, password) } });
+    raw.fill(0);
+  }
+  function faceSetup() {
+    if (!V.keys.login) return loginSetup();
+    const pw = pwField("fc0", "Master parol");
+    const b = el("button", { class: "btn" }, "📷 Yuzni skanerlaş");
+    b.onclick = async () => {
+      const done = busy(b, "Tekşirilmoqda…");
+      let raw; try { raw = await rawDekByPassword(pw.inp.value); raw.fill(0); } catch (_) { done(); return toast("Master parol notöğri"); }
+      const password = pw.inp.value;
+      let desc;
+      try { desc = await faceCapture("🙂 Yuzni saqlaş", "Yorug' joyda, telefonni yuz baravarida uşlang"); }
+      catch (e) { const t = faceErr(e); if (t) toast(t); return; }
+      try {
+        const key = rand(32);
+        const body = { descriptor: desc, fkey: B64.enc(key), blob: await idBlob(key, V.keys.login, password), fkey_wrapped: B64.enc(await seal(V.dek, key, "qq:fkey")) };
+        key.fill(0);
+        await api("/face/save", { method: "POST", body });
+        await loadKeys(); closeSheet(); renderVault(); toast("🙂 Yuz bilan tiklaş yoqildi");
+      } catch (e) { toast(e.message === "no_login" ? "Avval login tanlang" : "Saqlab bölmadi"); }
+    };
+    openSheet(el("h3", null, "🙂 Yuz bilan parolni tiklaş"),
+      el("div", { class: "info", style: "margin-bottom:12px" },
+        "Parolni unutsangiz, yangi telefondan login va yuzingiz bilan login-parolni qaytarasiz. Kamera tasodifiy tartibda tepaga, pastga, çapga, önga qaraşni söraydi — oddiy rasm yoki video bilan aldab bölmaydi."),
+      el("div", { class: "warn", style: "margin-bottom:12px" },
+        "⚠️ Bu usulda yuz andozasi va parolni oçadigan kalit serverda saqlanadi. Boşqa akkauntdan so'ralsa, 24 soat kutiş va Telegram'ga ogohlantiriş boradi — şu vaqtda bekor qila olasiz."),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Master parol (tasdiqlaş uçun)"), pw.row), b);
+  }
+  function faceRecoverFlow(preLogin) {
+    const lg = el("input", { class: "inp", placeholder: "Login", autocomplete: "username", autocapitalize: "none", spellcheck: "false", value: preLogin || "" });
+    const b = el("button", { class: "btn" }, "📷 Yuz bilan tekşiriş");
+    b.onclick = async () => {
+      const login = normLogin(lg.value);
+      if (!login) return toast("Seyf loginini yozing");
+      let desc;
+      try { desc = await faceCapture("🙂 Yuzni tekşiriş"); }
+      catch (e) { const t = faceErr(e); if (t) toast(t); return; }
+      try {
+        const r = await api("/face/recover", { method: "POST", body: { login, descriptor: desc } });
+        if (r.pending) {
+          V.transfer = { pending: true, ready_at: r.ready_at, method: "face", login };
+          renderVault();
+          return openSheet(el("h3", null, "⏳ Yuz mos keldi"),
+            el("div", { class: "info" }, `Xavfsizlik uçun login va parol ${fmtDate(r.ready_at)} da körsatiladi. Şu vaqtda seyf egasiga ogohlantiriş bordi. Muddat tugagach, Qora Qutini oçib, yuzni qayta tekşiring.`));
+        }
+        const data = JSON.parse(td.decode(await unseal(await importDek(B64.dec(r.fkey)), B64.dec(r.blob), "qq:idrec")));
+        showCreds(data.login, data.password, r.same);
+      } catch (e) {
+        toast({ wrong: "Yuz yoki login mos kelmadi", rate: "Juda köp urinish. 24 soatdan keyin qayta urinib köring" }[e.message] || "Tekşirib bölmadi");
+      }
+    };
+    openSheet(el("h3", null, "🙂 Yuz bilan tiklaş"),
+      el("div", { class: "info", style: "margin-bottom:12px" }, "Seyf loginini yozing va kamerada yuzingizni körsating. Mos kelsa, login va master parol körsatiladi (boşqa akkauntdan — 24 soatdan keyin)."),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Login"), lg), b);
+  }
+
+  // ---------------- Gmail zaxirasini yoqiş (seyf oçiq bölganda)
+  function emailBackupSetup() {
+    const pw = pwField("eb0", "Master parol");
+    const email = el("input", { class: "inp", type: "email", placeholder: "sizning@gmail.com", autocomplete: "email" });
+    const b1 = el("button", { class: "btn" }, "Kod yuboriş");
+    let raw = null;
+    b1.onclick = async () => {
+      const done = busy(b1, "Tekşirilmoqda…");
+      try { raw = await rawDekByPassword(pw.inp.value); pw.inp.value = ""; } catch (_) { done(); return toast("Master parol notöğri"); }
+      try { await api("/backup/email_start", { method: "POST", body: { email: email.value.trim() } }); }
+      catch (e) { done(); raw.fill(0); return toast({ email: "Gmail manzili notöğri", rate: "Juda köp urinish, keyinroq", email_taken: "Bu manzil boşqa seyfga ulangan", email_not_configured: "Pochta hali sozlanmagan" }[e.message] || "Yuborib bölmadi"); }
+      step2(email.value.trim());
+    };
+    const step2 = (addr) => {
+      const code = el("input", { class: "inp mono", inputmode: "numeric", maxlength: 6, placeholder: "6 xonali kod" });
+      const ans = answersForm(true);
+      const b2 = el("button", { class: "btn" }, "Yoqiş");
+      b2.onclick = async () => {
+        let a; try { a = ans.read(); } catch (e) { return toast(e.message); }
+        const done = busy(b2, "Şifrlanmoqda…");
+        try {
+          const v = await api("/backup/email_verify", { method: "POST", body: { email: addr, code: code.value.trim() } });
+          const d = await deriveD(a, v.user_salt);
+          const kek = await backupKek(d, v.pepper);
+          const wrapped = B64.enc(await seal(kek, raw, "qq:dek"));
+          await api("/backup/save", { method: "POST", body: { verifier: await verifierOf(d), backup_wrapped_key: wrapped } });
+          raw.fill(0); ans.clear();
+          await loadKeys(); closeSheet(); toast("📧 Gmail orqali tiklaş yoqildi");
+        } catch (e) { done(); toast({ wrong: "Kod notöğri", expired: "Kod eskirgan, qayta yuboring" }[e.message] || "Saqlab bölmadi"); }
+      };
+      openSheet(el("h3", null, "📧 Gmail orqali tiklaş"),
+        el("div", { class: "info", style: "margin-bottom:12px" }, `${addr} manziliga kod yuborildi (Spam papkasini ham tekşiring).`),
+        el("div", { class: "fld" }, el("div", { class: "lbl" }, "Gmail'dagi kod"), code),
+        el("div", { class: "warn", style: "margin-bottom:12px" }, "Ma'lumotlarni pasportdagidek yozing. Maxfiy sözni faqat siz biladigan qilib tanlang: tiklaş xavfsizligi şunga boğliq. Bu ma'lumotlar serverga yuborilmaydi."),
+        ...ans.rows, b2);
+    };
+    openSheet(el("h3", null, "📧 Gmail orqali tiklaşni yoqiş"),
+      el("div", { class: "info", style: "margin-bottom:12px" },
+        "Master parol ham, tiklaş kaliti ham yöqolsa, seyfni Gmail kodi, familiya, ism, otasining ismi, tuğilgan sana va maxfiy söz bilan qaytarasiz. Tiklaş 7 kun kutişdan keyin oçiladi, şu vaqtda Telegram va Gmail'ga ogohlantiriş boradi."),
+      el("div", { class: "warn", style: "margin-bottom:12px" }, "⚠️ Bu usul yoqilsa, Gmail'ingizga kira oladigan va şu ma'lumotlarni biladigan odam ham 7 kundan keyin seyfni oça oladi. Maxfiy sözni hec kimga aytmang."),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Master parol"), pw.row),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Gmail"), email), b1);
+  }
+
+  // ---------------- Gmail bilan tiklaş so'rovi (istalgan akkauntdan)
+  function emailRecoverFlow() {
+    const email = el("input", { class: "inp", type: "email", placeholder: "sizning@gmail.com", autocomplete: "email" });
+    const b1 = el("button", { class: "btn" }, "Kod yuboriş");
+    b1.onclick = async () => {
+      const addr = email.value.trim();
+      const done = busy(b1, "Yuborilmoqda…");
+      try { await api("/backup/recover_start", { method: "POST", body: { email: addr } }); }
+      catch (e) { done(); return toast({ email: "Gmail manzili notöğri", rate: "Juda köp urinish, keyinroq", email_not_configured: "Pochta hali sozlanmagan" }[e.message] || "Yuborib bölmadi"); }
+      const code = el("input", { class: "inp mono", inputmode: "numeric", maxlength: 6, placeholder: "6 xonali kod" });
+      const ans = answersForm(false);
+      const b2 = el("button", { class: "btn" }, "Tiklaş so'rovini yuboriş");
+      b2.onclick = async () => {
+        let a; try { a = ans.read(); } catch (e) { return toast(e.message); }
+        const done2 = busy(b2, "Tekşirilmoqda…");
+        try {
+          const { user_salt } = await api("/backup/salt", { method: "POST", body: { email: addr } });
+          const d = await deriveD(a, user_salt);
+          const r = await api("/backup/recover_verify", { method: "POST", body: { email: addr, code: code.value.trim(), d } });
+          ans.clear(); closeSheet();
+          V.transfer = { pending: true, ready_at: r.ready_at, method: "email" };
+          renderVault();
+          toast("So'rov qabul qilindi");
+        } catch (e) {
+          done2();
+          toast({ code: "Kod notöğri", code_expired: "Kod eskirgan, qayta yuboring", wrong: "Ma'lumotlar mos kelmadi", rate: "Juda köp urinish. 24 soatdan keyin qayta urinib köring", has_vault: "Bu akkauntda boşqa seyf bor" }[e.message] || "Bajarib bölmadi");
+        }
+      };
+      openSheet(el("h3", null, "📧 Seyfni tiklaş"),
+        el("div", { class: "info", style: "margin-bottom:12px" }, "Agar bu manzil seyfga ulangan bölsa, unga kod yuborildi (Spam papkasini ham tekşiring)."),
+        el("div", { class: "fld" }, el("div", { class: "lbl" }, "Gmail'dagi kod"), code), ...ans.rows, b2);
+    };
+    openSheet(el("h3", null, "📧 Gmail va şaxsiy ma'lumotlar bilan tiklaş"),
+      el("div", { class: "info", style: "margin-bottom:12px" }, "Seyfga ulangan Gmail'ingizni kiriting. Ma'lumotlar tögri bölsa, xavfsizlik uçun 7 kundan keyin seyf oçiladi (yangi akkaunt bölsa, şu akkauntga köçadi)."),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Gmail"), email), b1);
+  }
+
+  // ---------------- 7 kun ötgach: seyfni oçiş va yangi master parol
+  function emailFinishFlow() {
+    const email = el("input", { class: "inp", type: "email", placeholder: "sizning@gmail.com", autocomplete: "email" });
+    const ans = answersForm(false);
+    const p1 = pwField("ef1", "Yangi master parol"), p2 = pwField("ef2", "Yangi parolni takrorlang");
+    const btn = el("button", { class: "btn" }, "Seyfni oçiş");
+    btn.onclick = async () => {
+      let a; try { a = ans.read(); } catch (e) { return toast(e.message); }
+      if (p1.inp.value.length < 10 || strength(p1.inp.value) < 2) return toast("Yangi parol kamida 10 belgi va murakkab bölsin");
+      if (p1.inp.value !== p2.inp.value) return toast("Parollar bir xil emas");
+      const done = busy(btn, "Tekşirilmoqda…");
+      let raw;
+      try {
+        const { user_salt } = await api("/backup/salt", { method: "POST", body: { email: email.value.trim() } });
+        const d = await deriveD(a, user_salt);
+        const r = await api("/backup/recover_finish", { method: "POST", body: { d } });
+        raw = await unseal(await backupKek(d, r.pepper), B64.dec(r.backup_wrapped_key), "qq:dek");
+      } catch (e) { done(); return toast({ wrong: "Ma'lumotlar mos kelmadi", rate: "Juda köp urinish, 24 soatdan keyin", not_ready: "Hali vaqti kelmadi" }[e.message] || "Oçib bölmadi"); }
+      try {
+        await loadKeys();
+        const rk = newRecoveryKey();
+        await rewrap(raw, { password: p1.inp.value, rk });
+        await unlockWith(raw);
+        ans.clear(); p1.inp.value = p2.inp.value = "";
+        V.transfer = { pending: false };
+        showRecoveryKey(rk, false);
+      } catch (_) { done(); toast("Saqlab bölmadi"); }
+    };
+    openSheet(el("h3", null, "📧 Seyfni oçiş"),
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Gmail"), email), ...ans.rows,
+      el("div", { class: "fld" }, el("div", { class: "lbl" }, "Yangi master parol"), p1.row), el("div", { class: "fld" }, p2.row),
+      el("div", { class: "note", style: "margin-bottom:6px" }, "Oçilgandan keyin sizga yangi tiklaş kaliti beriladi."), btn);
   }
 
   function recoverFlow() {
@@ -909,10 +1764,19 @@
 
   function waitingView() {
     const t = new Date(V.transfer.ready_at);
+    if (V.transfer.method === "face") {
+      return el("div", { class: "lockbox" },
+        el("div", { class: "big" }, "⏳"), el("h2", null, "Yuz bilan tiklaş kutilmoqda"),
+        el("p", null, `Login va parol ${fmtDate(t.toISOString())} dan keyin körsatiladi. Seyf egasiga ogohlantiriş yuborildi.`),
+        el("button", { class: "btn", onclick: () => faceRecoverFlow(V.transfer.login) }, "🙂 Yuzni qayta tekşiriş"),
+        el("button", { class: "btn sec", onclick: () => { V.transfer = null; renderVault(); } }, "Boşqa usul"));
+    }
     return el("div", { class: "lockbox" },
       el("div", { class: "big" }, "⏳"), el("h2", null, "Köçiriş kutilmoqda"),
       el("p", null, `Seyfingiz ${fmtDate(t.toISOString())} da şu akkauntga köçadi. Bot sizga xabar beradi.`),
-      el("div", { class: "info" }, "Köçgandan keyin seyfni eski master parol yoki tiklaş kaliti bilan oçasiz."));
+      el("div", { class: "info" }, V.transfer.method === "email"
+        ? "Muddat tugagach, Qora Qutini oçib, şaxsiy ma'lumotlaringizni qayta kiritasiz va yangi master parol örnatasiz."
+        : "Köçgandan keyin seyfni eski master parol yoki tiklaş kaliti bilan oçasiz."));
   }
 
   function chooseType() {
@@ -992,7 +1856,13 @@
         if (n1.inp.value !== n2.inp.value) return toast("Parollar bir xil emas");
         const done = busy(b, "Şifrlanmoqda…");
         let raw; try { raw = await rawDekByPassword(o.inp.value); } catch (_) { done(); return toast("Hozirgi parol notöğri"); }
-        try { await rewrap(raw, { password: n1.inp.value }); raw.fill(0); closeSheet(); toast("Master parol özgartirildi"); }
+        try {
+          await rewrap(raw, { password: n1.inp.value }); raw.fill(0);
+          if (V.keys.login) await setLogin(V.keys.login, n1.inp.value).catch(() => toast("Login tekşiruvini yangilab bölmadi"));
+          await refreshIdBlob(V.keys.login, n1.inp.value).catch(() => toast("Pasport tiklaşini yangilab bölmadi"));
+          await refreshFaceBlob(V.keys.login, n1.inp.value).catch(() => toast("Yuz tiklaşini yangilab bölmadi"));
+          closeSheet(); toast("Master parol özgartirildi");
+        }
         catch (_) { done(); toast("Saqlab bölmadi"); }
       };
       openSheet(el("h3", null, "Master parolni özgartiriş"), el("div", { class: "fld" }, o.row), el("div", { class: "fld" }, n1.row), el("div", { class: "fld" }, n2.row), b);
@@ -1021,69 +1891,165 @@
         el("div", null, "Himoyalangan rejim"),
         el("div", { class: "lbl" }, "Bot yuborgan xabar va fayllarni forward qiliş, saqlaş va telefonda skrinşot oliş taqiqlanadi")), prot),
       el("div", { class: "note", style: "margin-bottom:6px" }, `Avto-qulf: 5 daqiqa harakatsizlikdan keyin.`),
-      change, newRk, V.dek ? el("button", { class: "btn sec", onclick: () => lock() }, "🔒 Hozir qulflaş") : null,
+      el("div", { class: "vf", style: "align-items:center" }, el("div", { class: "grow" },
+        el("div", null, "👤 Login"), el("div", { class: "lbl" }, V.keys.login || "tanlanmagan")),
+        el("button", { class: "mini", onclick: loginSetup }, V.keys.login ? "Özgartiriş" : "Tanlaş")),
+      V.keys.has_idrec
+        ? el("div", { class: "vf", style: "align-items:center" }, el("div", { class: "grow" },
+            el("div", null, "🪪 Pasport bilan tiklaş yoqilgan"), el("div", { class: "lbl" }, "Login va parolni pasport ma'lumotlari bilan qaytariş")),
+            el("button", { class: "mini", onclick: async (e) => {
+              const b = e.currentTarget;
+              if (b.dataset.sure !== "1") { b.dataset.sure = "1"; b.textContent = "Rostdan?"; return; }
+              try { await api("/idrec/disable", { method: "POST", body: {} }); await loadKeys(); closeSheet(); toast("Öçirildi"); } catch (_) { toast("Bajarib bölmadi"); }
+            } }, "Öçiriş"))
+        : el("button", { class: "btn sec", onclick: () => V.dek ? idrecSetup() : toast("Avval seyfni oçing") }, "🪪 Pasport bilan parolni tiklaşni yoqiş"),
+      IS_IOS
+        ? el("button", { class: "btn sec", onclick: async () => { const st = await bioReady(); if (st) { await bioDisable(); closeSheet(); } else bioEnable(); } },
+            "😊 Face ID bilan oçiş (yoqiş / öçiriş)")
+        : el("button", { class: "btn sec", onclick: async () => { if (await faceUnlockReady()) { await faceUnlockDisable(); closeSheet(); } else faceUnlockEnroll(); } },
+            "🙂 Yuz bilan oçiş — selfi (yoqiş / öçiriş)"),
+      IS_IOS ? null : el("button", { class: "btn sec", onclick: async () => {
+        const bm = await bioAvailable(); if (!bm) return toast("Bu telefonda barmoq izi Telegram orqali mavjud emas");
+        const st = await bioReady(); if (st) { await bioDisable(); closeSheet(); } else bioEnable();
+      } }, "👆 Barmoq izi bilan oçiş (yoqiş / öçiriş)"),
+      V.keys.has_face
+        ? el("div", { class: "vf", style: "align-items:center" }, el("div", { class: "grow" },
+            el("div", null, "🙂 Yuz bilan tiklaş yoqilgan"), el("div", { class: "lbl" }, "Login va parolni yuz bilan qaytariş")),
+            el("button", { class: "mini", onclick: async (e) => {
+              const b = e.currentTarget;
+              if (b.dataset.sure !== "1") { b.dataset.sure = "1"; b.textContent = "Rostdan?"; return; }
+              try { await api("/face/disable", { method: "POST", body: {} }); await loadKeys(); closeSheet(); toast("Öçirildi"); } catch (_) { toast("Bajarib bölmadi"); }
+            } }, "Öçiriş"))
+        : el("button", { class: "btn sec", onclick: () => V.dek ? faceSetup() : toast("Avval seyfni oçing") }, "🙂 Yuz bilan parolni tiklaşni yoqiş"),
+      change, newRk,
+      V.keys.email_ready ? (V.keys.backup_email
+        ? el("div", { class: "vf", style: "align-items:center;margin-top:10px" },
+            el("div", { class: "grow" }, el("div", null, "📧 Gmail orqali tiklaş yoqilgan"), el("div", { class: "lbl" }, V.keys.backup_email)),
+            el("button", { class: "mini", onclick: async (e) => {
+              const b = e.currentTarget;
+              if (b.dataset.sure !== "1") { b.dataset.sure = "1"; b.textContent = "Rostdan?"; return; }
+              try { await api("/backup/disable", { method: "POST", body: {} }); await loadKeys(); closeSheet(); toast("Gmail tiklaş öçirildi"); } catch (_) { toast("Bajarib bölmadi"); }
+            } }, "Öçiriş"))
+        : el("button", { class: "btn sec", onclick: emailBackupSetup }, "📧 Gmail orqali tiklaşni yoqiş")) : null,
+      V.dek ? el("button", { class: "btn sec", onclick: () => lock() }, "🔒 Hozir qulflaş") : null,
       el("div", { style: "height:18px" })];
   }
 
-  // ============================================================ FAYLLAR
-  const F = { list: null, metas: new Map(), uploading: [] };
+  // ============================================================ FAYLLAR (faqat seyf ochiq bo'lganda)
+  const F = { list: null, metas: new Map(), keys: new Map(), urls: new Map(), uploading: [], sec: "all" };
   async function loadFiles() {
+    if (!V.dek) { renderFiles(); return; }
     const r = await api("/files");
     F.list = r.files;
-    if (V.dek) for (const f of F.list) if (f.encrypted && !F.metas.has(f.id)) {
-      try { F.metas.set(f.id, JSON.parse(td.decode(await unseal(V.dek, B64.dec(f.enc_meta), "qq:meta")))); } catch (_) {}
+    for (const f of F.list) {
+      if (f.enc_meta && !F.metas.has(f.id)) {
+        try {
+          if (String(f.enc_meta).startsWith("pk1.")) { if (V.priv) F.metas.set(f.id, JSON.parse(td.decode(await pkOpen(f.enc_meta.slice(4))))); }
+          else F.metas.set(f.id, JSON.parse(td.decode(await unseal(V.dek, B64.dec(f.enc_meta), "qq:meta"))));
+        } catch (_) {}
+      }
+      if (f.enc_key && V.priv && !F.keys.has(f.id)) {
+        try { F.keys.set(f.id, await importDek(await pkOpen(f.enc_key))); } catch (_) {}
+      }
     }
     renderFiles();
   }
-  const FKIND = { photo: "🖼", video: "🎬", animation: "🎞", audio: "🎵", voice: "🎙", video_note: "⭕️", document: "📄", file: "🔒" };
+  const FKIND = { photo: "🖼", video: "🎬", animation: "🎞", audio: "🎵", voice: "🎙", video_note: "⭕️", document: "📄", file: "📄" };
+  const SECS = [["all", "Barçasi"], ["photo", "🖼 Rasmlar"], ["video", "🎬 Videolar"], ["audio", "🎵 Audio"], ["doc", "📄 Hujjatlar"]];
+  function secOf(f) {
+    const m = F.metas.get(f.id) || {};
+    const mime = m.mime || f.mime || "", kind = m.kind || f.kind;
+    if (kind === "photo" || /^image\//.test(mime)) return "photo";
+    if (["video", "animation", "video_note"].includes(kind) || /^video\//.test(mime)) return "video";
+    if (["audio", "voice"].includes(kind) || /^audio\//.test(mime)) return "audio";
+    return "doc";
+  }
   function fileName(f) {
-    if (f.encrypted) { const m = F.metas.get(f.id); return m ? m.name : "🔒 Şifrlangan fayl"; }
-    return f.file_name || ({ photo: "Rasm", video: "Video", animation: "GIF", audio: "Audio", voice: "Ovozli xabar", video_note: "Video xabar" }[f.kind] || "Fayl") + " #" + f.id;
+    const m = F.metas.get(f.id);
+    if (m && m.name) return m.name;
+    if (f.file_name) return f.file_name;
+    if (f.enc_meta && !m) return "🔒 Şifrlangan fayl";
+    const kind = (m && m.kind) || f.kind;
+    return ({ photo: "Rasm", video: "Video", animation: "GIF", audio: "Audio", voice: "Ovozli xabar", video_note: "Video xabar" }[kind] || "Fayl") + " · " + fmtDate(f.created_at);
   }
   function fileSub(f) {
-    const st = { tg_only: "Telegram bulutida", pending: "nusxasi yozilmoqda…", stored: "Telegram + zaxira nusxa", failed: "nusxa olinmadi", ready: "şifrlangan" }[f.status] || f.status;
+    const st = { tg_only: "Telegram bulutida (20 MB dan katta)", pending: "nusxasi yozilmoqda…", stored: "zaxira nusxa", failed: "nusxa olinmadi",
+      ready: "🔒 şifrlangan", await_key: "şifrlaşni kutyapti", encrypting: "şifrlanmoqda…" }[f.status] || f.status;
     return [f.size ? fmtBytes(f.size) : null, fmtDate(f.created_at), st].filter(Boolean).join(" · ");
+  }
+  function lockedFiles() {
+    return el("div", { class: "lockbox" }, el("div", { class: "big" }, "🔒"), el("h2", null, "Fayllar seyf içida"),
+      el("p", null, "Rasm, video va hujjatlarni körish uçun seyfni master parol bilan oçing."),
+      el("button", { class: "btn", onclick: () => switchTab("vault") }, "🔐 Seyfni oçiş"));
+  }
+  // Rasm katakchasi: bosilganda emas, ko'ringanda o'zi ochiladi (ketma-ket, 2 tadan)
+  const thumbQ = []; let thumbBusy = 0;
+  function pumpThumbs() {
+    while (thumbBusy < 2 && thumbQ.length) {
+      const [f, img] = thumbQ.shift();
+      thumbBusy++;
+      decryptFile(f).then((blob) => { const u = URL.createObjectURL(blob); F.urls.set(f.id, u); img.src = u; })
+        .catch(() => { img.alt = "⚠️"; }).finally(() => { thumbBusy--; pumpThumbs(); });
+    }
+  }
+  function photoTile(f) {
+    const img = el("img", { alt: "", loading: "lazy" });
+    const tile = el("button", { class: "m", style: "min-height:0;aspect-ratio:1", onclick: () => fileActions(f) }, img);
+    if (F.urls.has(f.id)) img.src = F.urls.get(f.id);
+    else if (f.encrypted && f.status === "ready" && (F.keys.has(f.id) || !String(f.enc_meta || "").startsWith("pk1."))) { thumbQ.push([f, img]); }
+    else tile.replaceChildren(el("div", { class: "act" }, el("div", { style: "font-size:26px" }, "🖼"), el("span", null, fileSub(f))));
+    return tile;
   }
   function renderFiles() {
     const box = $("tabFiles");
-    if (cur === "files") $("fab").hidden = false;
+    if (cur === "files") $("fab").hidden = !V.dek;
+    if (!V.dek) return box.replaceChildren(lockedFiles());
     if (!F.list) { box.replaceChildren(el("div", { class: "skel" }), el("div", { class: "skel" })); return; }
     const up = F.uploading.map((u) => el("div", { class: "item" }, el("div", { class: "ic" }, "⬆️"),
       el("div", { class: "grow" }, el("div", { class: "t" }, u.name), el("div", { class: "s" }, u.err ? "Xato: " + u.err : `Şifrlanib yuklanmoqda… ${Math.round(u.p * 100)}%`),
         el("div", { class: "progress" }, el("b", { style: `width:${Math.round(u.p * 100)}%` })))));
     const head = el("div", { class: "info", style: "margin-top:4px" },
-      "📤 Istalgan hajmdagi faylni bot çatiga yuboring — u şu yerda paydo böladi. 🔒 Maxfiy hujjatlarni pastdagi + tugmasi bilan yuklang: ular master parol bilan şifrlanadi.",
-      V.dek ? null : el("div", { style: "margin-top:6px" }, "Şifrlangan fayllar nomini körish uçun Seyf'ni oçing."));
+      "📥 Rasm, video, fayl yoki matnni botga taşlang (bir vaqtda yuzlab bölsa ham) — özi şifrlanib, şu yerda bölimlarga joylanadi. Yoki pastdagi ⬆ tugmasi bilan yuklang.");
+    const counts = { all: F.list.length }; for (const f of F.list) { const k = secOf(f); counts[k] = (counts[k] || 0) + 1; }
+    const chips = el("div", { class: "chips" }, SECS.filter(([k]) => k === "all" || counts[k]).map(([k, label]) =>
+      el("button", { class: "chip" + (F.sec === k ? " on" : ""), onclick: () => { F.sec = k; renderFiles(); } }, `${label} ${counts[k] || 0}`)));
     if (!F.list.length && !up.length) {
       return box.replaceChildren(head, el("div", { class: "empty" }, el("div", { style: "font-size:40px" }, "📁"), el("h2", null, "Hali fayl yöq"),
-        el("div", null, "Rasm, video, hujjat — istalgan faylni botga yuboring.")));
+        el("div", null, "Rasm, video, hujjat — istalgan narsani botga taşlang.")));
     }
-    box.replaceChildren(head, el("div", { class: "list" }, up, F.list.map((f) =>
-      el("button", { class: "item", onclick: () => fileActions(f) },
-        el("div", { class: "ic" }, f.encrypted ? "🔒" : (FKIND[f.kind] || "📄")),
-        el("div", { class: "grow" }, el("div", { class: "t" }, fileName(f)), el("div", { class: "s" }, fileSub(f)))))));
+    const list = F.list.filter((f) => F.sec === "all" || secOf(f) === F.sec);
+    thumbQ.length = 0;
+    const body = F.sec === "photo"
+      ? el("div", { class: "media", style: "grid-template-columns:repeat(3,1fr)" }, list.map(photoTile))
+      : el("div", { class: "list" }, up, list.map((f) =>
+        el("button", { class: "item", onclick: () => fileActions(f) },
+          el("div", { class: "ic" }, FKIND[(F.metas.get(f.id) || {}).kind || f.kind] || "📄"),
+          el("div", { class: "grow" }, el("div", { class: "t" }, fileName(f)), el("div", { class: "s" }, fileSub(f))))));
+    box.replaceChildren(head, chips, body);
+    pumpThumbs();
   }
 
   function fileActions(f) {
     const acts = [];
-    if (!f.encrypted) {
-      const send = el("button", { class: "btn" }, "📤 Telegramga yuboriş");
-      send.onclick = async () => { const done = busy(send, "Yuborilmoqda…"); try { await api("/files/send", { method: "POST", body: { id: f.id } }); toast("Bot çatiga yuborildi"); closeSheet(); } catch (_) { toast("Yuborib bölmadi"); } done(); };
+    const meta = F.metas.get(f.id) || {};
+    if (f.encrypted && f.status === "ready") {
+      const open = el("button", { class: "btn" }, "👁 Oçiş");
+      open.onclick = async () => {
+        const done = busy(open, "Şifr oçilmoqda…");
+        try { const blob = await decryptFile(f, (p) => { open.textContent = `Şifr oçilmoqda… ${Math.round(p * 100)}%`; }); done(); previewBlob(f, blob); }
+        catch (_) { done(); toast("Oçib bölmadi"); }
+      };
+      acts.push(open);
+    } else if (f.status === "tg_only" || f.status === "stored" || f.status === "pending") {
+      const send = el("button", { class: "btn" }, "📤 Bot çatiga yuboriş");
+      send.onclick = async () => { const done = busy(send, "Yuborilmoqda…"); try { await api("/files/send", { method: "POST", body: { id: f.id } }); toast("Bot çatiga yuborildi (himoyalangan)"); closeSheet(); } catch (_) { toast("Yuborib bölmadi"); } done(); };
       acts.push(send);
       if (f.status === "stored") acts.push(el("button", { class: "btn sec", onclick: async () => {
         try { const r = await api(`/files/download?id=${f.id}&download=1`); if (tg && tg.downloadFile && tg.isVersionAtLeast && tg.isVersionAtLeast("8.0")) tg.downloadFile({ url: r.url, file_name: fileName(f) }); else openLink(r.url); }
         catch (_) { toast("Yuklab bölmadi"); } } }, "⬇️ Zaxira nusxani yuklaş"));
+      if (f.status === "tg_only") acts.push(el("div", { class: "note", style: "margin-top:8px" }, "Fayl 20 MB dan katta: u Telegram bulutida turadi, bot uni faqat sizga himoyalangan holda qayta yuboradi."));
     } else {
-      if (!V.dek) acts.push(el("button", { class: "btn", onclick: () => { closeSheet(); switchTab("vault"); toast("Avval Seyf'ni oçing"); } }, "🔐 Seyf'ni oçiş"));
-      else {
-        const open = el("button", { class: "btn" }, "👁 Oçiş");
-        open.onclick = async () => {
-          const done = busy(open, "Şifr oçilmoqda…");
-          try { const blob = await decryptFile(f, (p) => { open.textContent = `Şifr oçilmoqda… ${Math.round(p * 100)}%`; }); done(); previewBlob(f, blob); }
-          catch (_) { done(); toast("Oçib bölmadi"); }
-        };
-        acts.push(open);
-      }
+      acts.push(el("div", { class: "info" }, f.status === "await_key" ? "Fayl şifrlaşni kutyapti — bir necha daqiqada tayyor böladi." : "Fayl tayyorlanmoqda…"));
     }
     const del = el("button", { class: "btn danger" }, "🗑 Öçiriş");
     del.onclick = async () => {
@@ -1091,32 +2057,36 @@
       try { await api("/files/delete", { method: "POST", body: { id: f.id } }); closeSheet(); await loadFiles(); toast("Öçirildi"); } catch (_) { toast("Öçirib bölmadi"); }
     };
     acts.push(del);
-    openSheet(el("h3", null, fileName(f)), el("div", { class: "note", style: "margin:-6px 0 12px" }, fileSub(f)),
-      f.caption ? el("div", { class: "info", style: "margin-bottom:8px" }, f.caption) : null, ...acts);
+    const caption = meta.caption || f.caption;
+    openSheet(el("h3", null, fileName(f)), el("div", { class: "note", style: "margin:-6px 0 12px" }, fileSub(f) + (meta.source ? " · " + meta.source : "")),
+      caption ? el("div", { class: "info", style: "margin-bottom:8px;white-space:pre-wrap" }, caption) : null, ...acts);
   }
 
   async function decryptFile(f, onp) {
     const meta = F.metas.get(f.id) || {};
+    const key = F.keys.get(f.id) || V.dek;
     const parts = [];
     for (let i = 0; i < f.chunks; i++) {
       const r = await api(`/files/chunk_url?id=${f.id}&i=${i}&mode=get`);
       const res = await fetch(r.url);
       if (!res.ok) throw new Error("download");
-      parts.push(await unseal(V.dek, new Uint8Array(await res.arrayBuffer()), `qq:file:${f.id}:${i}:${f.chunks}`));
+      parts.push(await unseal(key, new Uint8Array(await res.arrayBuffer()), `qq:file:${f.id}:${i}:${f.chunks}`));
       onp && onp((i + 1) / f.chunks);
     }
-    return new Blob(parts, { type: meta.mime || "application/octet-stream" });
+    const mime = meta.mime || ({ photo: "image/jpeg", video: "video/mp4", animation: "video/mp4", video_note: "video/mp4", voice: "audio/ogg" }[meta.kind || f.kind]) || "application/octet-stream";
+    return new Blob(parts, { type: mime });
   }
   function previewBlob(f, blob) {
     const meta = F.metas.get(f.id) || {};
-    const url = URL.createObjectURL(blob);
+    const url = F.urls.get(f.id) || URL.createObjectURL(blob);
     let view = null;
     if (/^image\//.test(blob.type)) view = el("img", { src: url });
     else if (/^video\//.test(blob.type)) view = el("video", { src: url, controls: true, playsinline: true });
     else if (/^audio\//.test(blob.type)) view = el("audio", { src: url, controls: true, style: "width:100%" });
     else if (/^text\/|json/.test(blob.type) && blob.size < 2e6) { view = el("pre"); blob.text().then((t) => { view.textContent = t; }); }
-    const save = el("a", { class: "btn sec", href: url, download: meta.name || "fayl" }, "⬇️ Qurilmaga saqlaş");
-    openSheet(el("h3", null, meta.name || "Fayl"), el("div", { class: "preview" }, view || el("div", { class: "info" }, "Bu fayl turini şu yerda körsatib bölmaydi. Qurilmaga saqlang.")), save);
+    const ext = ({ "image/jpeg": ".jpg", "video/mp4": ".mp4", "audio/ogg": ".ogg" })[blob.type] || "";
+    const save = el("a", { class: "btn sec", href: url, download: meta.name || ("qora_quti_" + f.id + ext) }, "⬇️ Qurilmaga saqlaş");
+    openSheet(el("h3", null, fileName(f)), el("div", { class: "preview" }, view || el("div", { class: "info" }, "Bu fayl turini şu yerda körsatib bölmaydi. Qurilmaga saqlang.")), save);
   }
 
   $("filePick").onchange = async (e) => {
@@ -1172,11 +2142,11 @@
     $("tabFiles").hidden = t !== "files";
     $("tabChannels").hidden = t !== "channels";
     $("chTools").hidden = t !== "channels";
-    $("fab").hidden = !((t === "vault" && V.dek) || t === "files");
+    $("fab").hidden = !((t === "vault" || t === "files") && V.dek);
     $("fab").textContent = t === "files" ? "⬆" : "+";
     try { localStorage.setItem("qq_tab", t); } catch (_) {}
     if (t === "vault") renderVault();
-    if (t === "files") { renderFiles(); loadFiles().catch(() => toast("Fayllarni yuklab bölmadi")); }
+    if (t === "files") { renderFiles(); if (V.dek) loadFiles().catch(() => toast("Fayllarni yuklab bölmadi")); }
     if (t === "channels" && !channelsLoaded) { channelsLoaded = true; loadPosts(true); }
     window.scrollTo(0, 0);
   }
@@ -1198,7 +2168,7 @@
     $("tabVault").replaceChildren(el("div", { class: "skel" }), el("div", { class: "skel" }));
     try {
       await Promise.all([loadMe(), loadKeys()]);
-      if (!V.keys.exists) { try { V.transfer = await api("/recovery/status"); } catch (_) {} }
+      try { V.transfer = await api("/recovery/status"); } catch (_) {}
     } catch (e) {
       $("tabVault").replaceChildren(el("div", { class: "empty" }, el("h2", null, e.status === 401 ? "Kiriş tasdiqlanmadi" : "Ulanib bölmadi"),
         el("div", null, e.status === 401 ? "Mini App'ni bot menyusidan qayta oçing." : "Birozdan keyin qayta urinib köring."),
@@ -1209,7 +2179,9 @@
     renderHeader();
     let t = "vault";
     try { t = localStorage.getItem("qq_tab") || "vault"; } catch (_) {}
+    if (location.hash === "#tiklash") t = "vault";
     switchTab(["vault", "files", "channels"].includes(t) ? t : "vault");
+    if (location.hash === "#tiklash") { try { history.replaceState(null, "", location.pathname + location.search); } catch (_) {} idRecoverFlow(); }
   }
   boot();
 })();
