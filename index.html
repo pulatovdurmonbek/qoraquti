@@ -116,6 +116,49 @@
   .inp.mono, .mono { font-family: ui-monospace, Menlo, monospace; font-size: 14px; }
   .btn { display: block; width: 100%; padding: 13px; border-radius: 12px; background: var(--accent); color: #111; font-weight: 700; text-align: center; margin-top: 10px; }
   .btn.sec { background: var(--bg2); color: var(--text); font-weight: 600; }
+
+  /* 💬 Telegram chatlari */
+  .tg-head { display: flex; align-items: center; gap: 10px; margin: 6px 0 12px; }
+  .tg-head h2 { margin: 0; font-size: 19px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dlg { display: flex; gap: 12px; align-items: center; padding: 10px 6px; border-bottom: 1px solid var(--line); cursor: pointer; }
+  .dlg .av { width: 44px; height: 44px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-weight: 700; flex: none; }
+  .dlg .g { flex: 1; min-width: 0; }
+  .dlg .n { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dlg .m { color: var(--hint); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dlg .u { background: var(--accent); color: #111; border-radius: 10px; font-size: 12px; font-weight: 700; padding: 1px 7px; }
+  .msgs { display: flex; flex-direction: column; gap: 6px; padding-bottom: 90px; }
+  .bub { max-width: 82%; padding: 7px 10px; border-radius: 14px; background: var(--card); white-space: pre-wrap; word-wrap: break-word; font-size: 15px; }
+  .bub.out { align-self: flex-end; background: var(--accent-soft); }
+  .bub .who { font-size: 12px; color: var(--link); font-weight: 600; }
+  .bub .t { font-size: 11px; color: var(--hint); text-align: right; margin-top: 2px; }
+  .bub .md { font-size: 13px; color: var(--link); margin-top: 3px; cursor: pointer; }
+  .tg-send { position: fixed; left: 0; right: 0; bottom: calc(64px + env(safe-area-inset-bottom)); background: var(--bg); padding: 8px 12px; display: flex; gap: 8px; max-width: 720px; margin: 0 auto; border-top: 1px solid var(--line); z-index: 4; }
+  .tg-send textarea { flex: 1; min-height: 42px; max-height: 120px; resize: none; }
+  .tg-send button { width: 46px; border-radius: 12px; background: var(--accent); color: #111; font-size: 18px; font-weight: 700; }
+  .tg-warn { background: rgba(240, 160, 32, .12); border-radius: 12px; padding: 10px 12px; font-size: 13px; margin: 10px 0; }
+
+  /* kiriş kodi */
+  #lock { position: fixed; inset: 0; z-index: 200; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px calc(24px + env(safe-area-inset-bottom)); text-align: center; user-select: none; -webkit-user-select: none; }
+  #lock[hidden] { display: none; }
+  #lock h2 { margin: 14px 0 4px; font-size: 20px; }
+  #lock .sub { color: var(--hint); font-size: 14px; min-height: 20px; }
+  #lock .err { color: var(--bad); }
+  .pdots { display: flex; gap: 14px; justify-content: center; margin: 22px 0 18px; }
+  .pdots i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--hint); }
+  .pdots i.on { background: var(--accent); border-color: var(--accent); }
+  .shake { animation: shake .35s; }
+  @keyframes shake { 20%, 60% { transform: translateX(-9px); } 40%, 80% { transform: translateX(9px); } }
+  .pkeys { display: grid; grid-template-columns: repeat(3, 72px); gap: 14px 22px; justify-content: center; }
+  .pkeys button { width: 72px; height: 72px; border-radius: 50%; background: var(--bg2); font-size: 26px; font-weight: 600; }
+  .pkeys button:active { background: var(--accent-soft); }
+  .pkeys button.ghost { background: none; font-size: 15px; color: var(--hint); }
+  .pat { position: relative; width: 264px; height: 264px; margin: 18px auto 8px; touch-action: none; }
+  .pat svg { position: absolute; inset: 0; pointer-events: none; }
+  .pat i { position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: var(--hint); opacity: .55; transition: transform .1s; }
+  .pat i.on { background: var(--accent); opacity: 1; transform: scale(1.35); }
+  .lk-link { margin-top: 18px; color: var(--link); font-size: 14px; }
+  .lk-choice { display: grid; gap: 10px; width: 100%; max-width: 320px; margin-top: 18px; }
+
   .btn.danger { background: rgba(229, 72, 77, .14); color: var(--bad); font-weight: 600; }
   .btn:disabled { opacity: .55; }
   .lockbox { text-align: center; padding: 28px 6px 10px; }
@@ -158,6 +201,38 @@
   .steps i { width: 26px; height: 6px; border-radius: 6px; background: var(--line); }
   .steps i.on { background: var(--ok); }
   .preview pre { white-space: pre-wrap; background: var(--bg2); padding: 10px; border-radius: 10px; max-height: 50vh; overflow: auto; }
+  /* 🔷 ko'k-qora dizayn (Telegram mavzusidan qat'i nazar bir xil) */
+  :root { --bg:#04060c; --bg2:#0a1122; --card:#0d172b; --text:#e8eefa; --hint:#8798b8; --link:#5fb0ff; --accent:#2f7dff; --accent2:#22d3ee;
+    --accent-soft:rgba(47,125,255,.16); --line:rgba(110,150,255,.15); --r:16px; }
+  html, body { background: var(--bg); color: var(--text); }
+  body { background: radial-gradient(900px 520px at 85% -12%, rgba(47,125,255,.20), transparent 62%), radial-gradient(760px 460px at -12% 112%, rgba(34,211,238,.11), transparent 60%), var(--bg); background-attachment: fixed; }
+  .logo { background: linear-gradient(145deg,#0c1630,#060a14); border-color: var(--accent); box-shadow: 0 0 18px rgba(47,125,255,.35), inset 0 0 10px rgba(34,211,238,.18); }
+  .logo i { background: radial-gradient(circle,#9fe8ff,var(--accent2) 45%,var(--accent)); box-shadow: 0 0 14px var(--accent2); }
+  #lock { background: radial-gradient(600px 420px at 50% 0%, rgba(47,125,255,.22), transparent 70%), radial-gradient(500px 360px at 50% 110%, rgba(34,211,238,.12), transparent 70%), var(--bg); }
+  #lock .logo { animation: qqDial 9s linear infinite; }
+  @keyframes qqDial { to { transform: rotate(360deg); } }
+  @keyframes qqRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  #lock > * { animation: qqRise .45s ease both; }
+  /* 🔐 seyf eshigi ochilishi */
+  #vfx { position: fixed; inset: 0; z-index: 400; display: grid; place-items: center; background: radial-gradient(circle at 50% 45%, #0b1630, #02040a 70%); perspective: 1100px; pointer-events: none; animation: vfxOut .45s ease 1.55s forwards; }
+  #vfx .vlight { position: absolute; width: 62vmin; height: 62vmin; border-radius: 50%; background: radial-gradient(circle, rgba(140,220,255,.95), rgba(47,125,255,.55) 35%, transparent 70%); opacity: 0; animation: vfxLight .6s ease .95s forwards; }
+  #vfx .vdoor { position: relative; width: 62vmin; height: 62vmin; border-radius: 50%; transform-origin: 0% 50%;
+    background: radial-gradient(circle at 35% 30%, #2a3b5c, #0f1a30 55%, #070c18); box-shadow: 0 0 0 6px #1b2a47, 0 0 0 12px #0a1222, 0 0 40px rgba(47,125,255,.45), inset 0 0 30px rgba(0,0,0,.7);
+    animation: vfxSwing .6s cubic-bezier(.5,0,.3,1) .95s forwards; }
+  #vfx .ring { position: absolute; border-radius: 50%; border: 2px solid rgba(110,170,255,.35); }
+  #vfx .r1 { inset: 9%; } #vfx .r2 { inset: 22%; border-style: dashed; animation: qqDial 1.2s linear; }
+  #vfx .wheel { position: absolute; inset: 34%; border-radius: 50%; border: 5px solid #9fc4ff; box-shadow: 0 0 16px rgba(120,190,255,.7); animation: vfxWheel .9s cubic-bezier(.4,0,.2,1) forwards; }
+  #vfx .wheel i { position: absolute; left: 50%; top: -38%; width: 6px; height: 176%; margin-left: -3px; background: linear-gradient(#cfe3ff,#6f9fe6); border-radius: 3px; }
+  #vfx .wheel i:nth-child(2) { transform: rotate(60deg); } #vfx .wheel i:nth-child(3) { transform: rotate(120deg); }
+  #vfx .wheel::after { content: ""; position: absolute; inset: 32%; border-radius: 50%; background: radial-gradient(circle,#e8f3ff,#4c86e0); }
+  #vfx .bolt { position: absolute; width: 9%; height: 3.4%; background: #7ea6e6; border-radius: 4px; box-shadow: 0 0 8px rgba(120,190,255,.6); animation: vfxBolt .3s ease .7s forwards; }
+  #vfx .b1 { right: -3%; top: 48%; } #vfx .b2 { right: 6%; top: 18%; transform: rotate(-35deg); } #vfx .b3 { right: 6%; bottom: 18%; transform: rotate(35deg); }
+  @keyframes vfxWheel { to { transform: rotate(-540deg); } }
+  @keyframes vfxBolt { to { opacity: 0; translate: -18px 0; } }
+  @keyframes vfxSwing { to { transform: rotateY(-108deg); opacity: .85; } }
+  @keyframes vfxLight { to { opacity: 1; transform: scale(1.5); } }
+  @keyframes vfxOut { to { opacity: 0; visibility: hidden; } }
+  @media (prefers-reduced-motion: reduce) { #vfx { display: none; } #lock .logo { animation: none; } }
 </style>
 </head>
 <body>
@@ -181,6 +256,7 @@
   </header>
   <section id="tabVault"></section>
   <section id="tabFiles" hidden></section>
+  <section id="tabTg" hidden></section>
   <section id="tabChannels" hidden>
     <main class="feed" id="feed"></main>
     <button class="more" id="more" hidden>Yana yuklaş</button>
@@ -192,6 +268,7 @@
   <button data-tab="vault" class="on"><span class="i">🔐</span>Seyf</button>
   <button data-tab="files"><span class="i">📁</span>Fayllar</button>
   <button data-tab="channels"><span class="i">📢</span>Kanallar</button>
+  <button data-tab="tg"><span class="i">💬</span>Chatlar</button>
 </nav>
 
 <div class="sheet-bg" id="sheetBg"></div>
@@ -341,11 +418,16 @@
   async function api(path, opts = {}) {
     const res = await fetch(API + path, {
       method: opts.method || "GET",
-      headers: { Authorization: "tma " + initData, ...(opts.body ? { "Content-Type": "application/json" } : {}) },
+      headers: { Authorization: "tma " + initData, ...(LOCK.token ? { "x-qq-lock": LOCK.token } : {}), ...(opts.body ? { "Content-Type": "application/json" } : {}) },
       body: opts.body ? JSON.stringify(opts.body) : undefined,
     });
     let data = null;
     try { data = await res.json(); } catch (_) {}
+    if (res.status === 423 && !opts._retry && !path.startsWith("/lock/")) {
+      LOCK.token = null;
+      await lockGate();
+      return api(path, { ...opts, _retry: true });
+    }
     if (!res.ok) { const e = new Error((data && data.error) || "HTTP " + res.status); e.status = res.status; e.data = data; throw e; }
     return data;
   }
@@ -537,7 +619,8 @@
           el("li", null, "Botni admin qiling — maxsus huquq şart emas."),
           el("li", null, "Yangi postlar şu yerda paydo böladi.")),
         el("br"),
-        el("button", { class: "cta", onclick: () => openLink(`https://t.me/${me.bot}?startchannel`) }, "➕ Kanal qöşiş"));
+        el("button", { class: "cta", onclick: () => openLink(`https://t.me/${me.bot}?startchannel`) }, "➕ Kanal qöşiş"),
+        el("div", { style: "margin-top:12px" }, el("button", { class: "cta", style: "background:var(--bg2);color:var(--text)", onclick: followSheet }, "🌍 Begona ochiq kanalni arxivlaş")));
     }
     if (state.q) return el("div", { class: "empty" }, el("h2", null, "Hec narsa topilmadi"), el("div", null, "Boşqa söz bilan urinib köring. Kirill va lotin yozuvi farqi yöq."));
     return el("div", { class: "empty" }, el("div", { style: "font-size:40px" }, "⏳"), el("h2", null, "Arxiv hozirça böş"), el("div", null, "Kanalga yangi post çiqsa, u şu yerda saqlanadi."));
@@ -631,6 +714,13 @@
     const rows = me.channels.map((c) => {
       const btn = c.status === "active" ? el("button", { class: "sbtn" }, "Töxtatiş")
         : (c.status === "paused" || c.status === "over_quota") ? el("button", { class: "sbtn" }, "Davom ettiriş") : null;
+      const delBtn = c.source === "web" ? el("button", { class: "sbtn", style: "margin-left:6px" }, "🗑") : null;
+      if (delBtn) delBtn.onclick = async () => {
+        const ok = await new Promise((r) => (tg && tg.showConfirm ? tg.showConfirm(tr("Kanal va uning arxivi öçirilsinmi?"), r) : r(confirm(tr("Kanal va uning arxivi öçirilsinmi?")))));
+        if (!ok) return;
+        try { await api("/channel", { method: "POST", body: { id: c.id, action: "delete" } }); if (state.channel === c.id) state.channel = null; await loadMe(); showSettings(); renderHeader(); loadPosts(true); }
+        catch (_) { toast("Öçirib bölmadi"); }
+      };
       if (btn) btn.onclick = async () => {
         btn.disabled = true;
         try {
@@ -643,17 +733,21 @@
         }
       };
       return el("div", { class: "row" }, el("span", { class: "dot " + c.status }),
-        el("div", { class: "grow" }, el("div", { class: "t" }, c.title || "Kanal"), el("div", { class: "s" }, `${STATUS[c.status] || c.status} · ${c.posts_count} ta post`)), btn);
+        el("div", { class: "grow" }, el("div", { class: "t" }, (c.source === "web" ? "🌍 " : "") + (c.title || "Kanal")),
+          el("div", { class: "s" }, `${STATUS[c.status] || c.status} · ${c.posts_count} ta post${c.source === "web" ? " · begona kanal" : ""}`)), btn, delBtn);
     });
     openSheet(
       el("h3", { style: "margin-top:6px" }, "🌐 Til / Язык / Language"), langRow(),
+      ...lockSettings(),
       ...vaultSettings(),
       el("h3", null, "📢 Kanallar va tarif"),
       ...rows,
       el("div", { class: "row" }, el("div", { class: "grow" },
         el("div", { class: "t" }, me.user.plan === "pro" ? "Pro tarif" : "Bepul tarif"),
         el("div", { class: "s" }, `${me.limits.channels} ta kanal · ${fmtBytes(me.limits.bytes)} media · işlatilgan ${fmtBytes(me.user.used_bytes)}`))),
-      el("div", { style: "margin-top:16px;text-align:center" }, el("button", { class: "cta", onclick: () => openLink(`https://t.me/${me.bot}?startchannel`) }, "➕ Kanal qöşiş")),
+      el("div", { style: "margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap" },
+        el("button", { class: "cta", onclick: () => openLink(`https://t.me/${me.bot}?startchannel`) }, "➕ Öz kanalim"),
+        el("button", { class: "cta", style: "background:var(--bg2);color:var(--text)", onclick: followSheet }, "🌍 Begona kanal")),
       el("div", { class: "note", style: "margin-top:14px;text-align:center" }, "Arxiv faqat sizga körinadi. Media fayllar 10 daqiqalik himoyalangan havola orqali oçiladi."));
   }
   $("btnSettings").onclick = () => state.me && showSettings();
@@ -981,11 +1075,13 @@
     V.last = Date.now();
     await ensureKeyPair().catch((e) => console.error("keypair", e));
     await loadItems();
+    vaultFx();
     if (cur === "files") loadFiles().catch(() => {});
   }
   function lock(silent) {
     if (!V.dek) return;
     V.dek = null; V.items = []; V.priv = null;
+    tgClose();
     F.list = null; F.metas.clear(); F.keys.clear(); for (const u of F.urls.values()) URL.revokeObjectURL(u); F.urls.clear();
     closeSheet();
     renderVault(); if (cur === "files") renderFiles();
@@ -2141,6 +2237,7 @@
     $("tabVault").hidden = t !== "vault";
     $("tabFiles").hidden = t !== "files";
     $("tabChannels").hidden = t !== "channels";
+    $("tabTg").hidden = t !== "tg";
     $("chTools").hidden = t !== "channels";
     $("fab").hidden = !((t === "vault" || t === "files") && V.dek);
     $("fab").textContent = t === "files" ? "⬆" : "+";
@@ -2148,6 +2245,7 @@
     if (t === "vault") renderVault();
     if (t === "files") { renderFiles(); if (V.dek) loadFiles().catch(() => toast("Fayllarni yuklab bölmadi")); }
     if (t === "channels" && !channelsLoaded) { channelsLoaded = true; loadPosts(true); }
+    if (t === "tg") tgOpen();
     window.scrollTo(0, 0);
   }
   for (const b of $("nav").querySelectorAll("button")) b.onclick = () => switchTab(b.dataset.tab);
@@ -2156,6 +2254,582 @@
   async function loadMe() {
     state.me = await api("/me");
     renderHeader();
+  }
+
+
+
+  // ------------------------------------------------------------ 💬 Telegram chatlari: seyf içida Telegram mijozi
+  // Akkaunt sessiyasi faqat SEYF KALITI (master parol) bilan telefonda şifrlanib serverga yoziladi — server uni oça olmaydi.
+  // Ulaniş to'g'ridan-to'g'ri Telegram serverlariga (MTProto, WebSocket). Xabarlar bizning serverdan ötmaydi.
+  const T = { cfg: null, G: null, client: null, me: null, dialogs: [], chat: null, msgs: [], saved: {}, view: "list", busy: false, handler: null };
+  const TG_JS = ["tg.js?v=1", API.replace(/\/api$/, "") + "/asset/tg.js?v=1"];
+  function loadGram() {
+    if (window.GramJS) return Promise.resolve(window.GramJS);
+    const tryOne = (src) => new Promise((res, rej) => { const sc = document.createElement("script"); sc.src = src; sc.onload = () => (window.GramJS ? res(window.GramJS) : rej(new Error("gram"))); sc.onerror = () => rej(new Error("load")); document.head.append(sc); });
+    return tryOne(TG_JS[0]).catch(() => tryOne(TG_JS[1]));
+  }
+  const tgBox = () => $("tabTg");
+  const tgErr = (e) => {
+    const m = String((e && (e.errorMessage || e.message)) || e);
+    const w = /FLOOD_WAIT_(\d+)/.exec(m) || (e && e.seconds ? [0, e.seconds] : null);
+    if (w) return `Telegram vaqtinça çekladi — ${lockDur(Number(w[1]))} kuting`;
+    return ({ PHONE_NUMBER_INVALID: "Telefon raqami notöğri", PHONE_CODE_INVALID: "Kod notöğri", PHONE_CODE_EXPIRED: "Kod eskirgan — qaytadan söreng",
+      PASSWORD_HASH_INVALID: "Ikki bosqiçli parol notöğri", PHONE_NUMBER_BANNED: "Bu raqam Telegramda bloklangan", AUTH_KEY_UNREGISTERED: "Sessiya tugagan — qaytadan kiring",
+      SESSION_REVOKED: "Sessiya boşqa qurilmadan yopilgan — qaytadan kiring", USER_DEACTIVATED: "Akkaunt öçirilgan" })[m.replace(/^.*?([A-Z_]{6,}).*$/, "$1")] || "Xato: " + m.slice(0, 80);
+  };
+  function tgClose() {
+    if (T.client) { try { T.client.disconnect(); } catch (_) {} }
+    Object.assign(T, { client: null, me: null, dialogs: [], chat: null, msgs: [], view: "list", handler: null });
+    if (cur === "tg") tgRender();
+  }
+  async function tgSaveSession() {
+    if (!T.client || !V.dek) return;
+    const plain = JSON.stringify({ s: T.client.session.save(), saved: T.saved });
+    await api("/tg/session", { method: "POST", body: { blob: B64.enc(await seal(V.dek, te.encode(plain), "qq:tg")) } });
+  }
+  async function tgOpen() {
+    if (!V.dek) return tgRender();
+    if (T.client) return tgRender();
+    tgBox().replaceChildren(el("div", { class: "skel" }), el("div", { class: "skel" }));
+    try {
+      T.cfg = T.cfg || await api("/tg/config");
+      if (!T.cfg.api_id) return tgRender();
+      const [G, ss] = await Promise.all([loadGram(), api("/tg/session")]);
+      T.G = G;
+      if (!ss.blob) return tgLogin();
+      const box = JSON.parse(new TextDecoder().decode(await unseal(V.dek, B64.dec(ss.blob), "qq:tg")));
+      T.saved = box.saved || {};
+      const c = new G.TelegramClient(new G.StringSession(box.s), T.cfg.api_id, T.cfg.api_hash, { connectionRetries: 3, useWSS: true });
+      c.setLogLevel && c.setLogLevel("error");
+      await c.connect();
+      if (!(await c.checkAuthorization())) { await api("/tg/session", { method: "DELETE" }).catch(() => {}); c.disconnect(); toast("Sessiya tugagan — qaytadan kiring"); return tgLogin(); }
+      T.client = c;
+      await tgStart();
+    } catch (e) {
+      tgBox().replaceChildren(el("div", { class: "empty" }, el("h2", null, "Telegramga ulanib bölmadi"), el("div", null, tgErr(e)), el("br"),
+        el("button", { class: "cta", onclick: () => { tgClose(); tgOpen(); } }, "Qayta urinish")));
+    }
+  }
+  async function tgStart() {
+    T.me = await T.client.getMe();
+    T.handler = (ev) => tgIncoming(ev).catch(() => {});
+    T.client.addEventHandler(T.handler, new T.G.NewMessage({}));
+    await tgLoadDialogs();
+  }
+  function tgRender() {
+    const box = tgBox();
+    if (!V.dek) {
+      return box.replaceChildren(el("div", { class: "lockbox" }, el("div", { class: "big" }, "💬"), el("h2", null, "Telegram chatlari seyf içida"),
+        el("p", null, "Şaxsiy chatlaringizni Qora Qutida yozişiş va saqlaş uçun seyfni master parol bilan oçing."),
+        el("button", { class: "btn", onclick: () => switchTab("vault") }, "🔐 Seyfni oçiş")));
+    }
+    if (T.cfg && !T.cfg.api_id) {
+      return box.replaceChildren(el("div", { class: "empty" }, el("div", { style: "font-size:40px" }, "💬"), el("h2", null, "Hozirça ulanmagan"),
+        el("div", null, "Bot egasi Telegram API kalitini (TG_API_ID, TG_API_HASH) kiritgaç işlaydi.")));
+    }
+    if (!T.client) return void tgOpen();
+    if (T.view === "chat" && T.chat) return tgRenderChat();
+    tgRenderList();
+  }
+
+  // ---- kiriş (telefon → kod → ikki bosqiçli parol)
+  function tgLogin() {
+    const G = T.G;
+    const box = tgBox();
+    const ph = el("input", { class: "inp", type: "tel", placeholder: "+998 90 123 45 67", autocomplete: "tel" });
+    const b = el("button", { class: "btn" }, "Kod yuboriş");
+    const warn = el("div", { class: "tg-warn" }, "🔐 Sessiya faqat sizning seyf kalitingiz bilan şifrlanib saqlanadi — server ham, boşqa hec kim ham uni oça olmaydi. Telegram kirişni \"Qurilmalar\" röyxatida \"Qora Quti\" deb körsatadi; xohlagan payt öçirib qöyişingiz mumkin.");
+    box.replaceChildren(el("div", { class: "tg-head" }, el("h2", null, "💬 Telegram akkauntini ulaş")), warn,
+      el("div", { class: "note", style: "margin-bottom:8px" }, "Şaxsiy chatlaringizni şu yerda öqiş, yozişiş va seyfga saqlaş mumkin böladi."), ph, b);
+    b.onclick = async () => {
+      const phone = ph.value.replace(/[^\d+]/g, "");
+      if (phone.replace(/\D/g, "").length < 9) return toast("Telefon raqamini töliq yozing");
+      const stop = busy(b, "Yuborilmoqda…");
+      try {
+        const c = new G.TelegramClient(new G.StringSession(""), T.cfg.api_id, T.cfg.api_hash, { connectionRetries: 3, useWSS: true, deviceModel: "Qora Quti", appVersion: "1.0", systemVersion: "Mini App" });
+        c.setLogLevel && c.setLogLevel("error");
+        await c.connect();
+        const sent = await c.sendCode({ apiId: T.cfg.api_id, apiHash: T.cfg.api_hash }, phone);
+        stop();
+        tgCode(c, phone, sent.phoneCodeHash);
+      } catch (e) { stop(); toast(tgErr(e)); }
+    };
+  }
+  function tgCode(c, phone, hash) {
+    const G = T.G;
+    const code = el("input", { class: "inp", inputmode: "numeric", placeholder: "Kod", autocomplete: "one-time-code", style: "font-size:22px;letter-spacing:6px;text-align:center" });
+    const b = el("button", { class: "btn" }, "Kiriş");
+    tgBox().replaceChildren(el("div", { class: "tg-head" }, el("h2", null, "Kodni kiriting")),
+      el("div", { class: "note" }, `Telegram ilovangizga (${phone}) kod yuborildi. Uni faqat şu yerga yozing — hec kimga yubormang va Telegramda hec qayerga yozmang.`),
+      el("div", { style: "height:10px" }), code, b, el("button", { class: "lk-link", onclick: () => { c.disconnect(); tgLogin(); } }, "← Boşqa raqam"));
+    b.onclick = async () => {
+      const v = code.value.replace(/\D/g, "");
+      if (v.length < 4) return toast("Kodni kiriting");
+      const stop = busy(b, "Tekşirilmoqda…");
+      try {
+        const r = await c.invoke(new G.Api.auth.SignIn({ phoneNumber: phone, phoneCodeHash: hash, phoneCode: v }));
+        if (r instanceof G.Api.auth.AuthorizationSignUpRequired) { stop(); return toast("Bu raqamda Telegram akkaunt yöq"); }
+        await tgDone(c);
+      } catch (e) {
+        stop();
+        if (/SESSION_PASSWORD_NEEDED/.test(String(e && (e.errorMessage || e.message)))) return tgPassword(c);
+        toast(tgErr(e));
+      }
+    };
+  }
+  function tgPassword(c) {
+    const G = T.G;
+    const pw = el("input", { class: "inp", type: "password", placeholder: tr("Ikki bosqiçli parol"), autocomplete: "current-password" });
+    const b = el("button", { class: "btn" }, "Tasdiqlaş");
+    tgBox().replaceChildren(el("div", { class: "tg-head" }, el("h2", null, "Ikki bosqiçli parol")),
+      el("div", { class: "note", style: "margin-bottom:10px" }, "Akkauntingizda qöşimça parol (Two-Step Verification) yoqilgan."), pw, b);
+    b.onclick = async () => {
+      if (!pw.value) return toast("Parolni kiriting");
+      const stop = busy(b, "Tekşirilmoqda…");
+      try {
+        const info = await c.invoke(new G.Api.account.GetPassword());
+        await c.invoke(new G.Api.auth.CheckPassword({ password: await G.computeCheck(info, pw.value) }));
+        await tgDone(c);
+      } catch (e) { stop(); toast(tgErr(e)); }
+    };
+  }
+  async function tgDone(c) {
+    T.client = c;
+    T.saved = {};
+    await tgSaveSession();
+    toast("Telegram akkaunti ulandi");
+    await tgStart();
+  }
+
+  // ---- chatlar ro'yxati
+  const dName = (d) => d.title || d.name || [d.entity && d.entity.firstName, d.entity && d.entity.lastName].filter(Boolean).join(" ") || "—";
+  const mLabel = (m) => {
+    if (!m) return "";
+    const media = m.photo ? "📷 Rasm" : m.video ? "🎬 Video" : m.voice ? "🎤 Ovozli xabar" : m.audio ? "🎵 Audio" : m.sticker ? "Stiker" : m.document ? "📎 Fayl" : m.media ? "Media" : "";
+    return [media && tr(media), m.message].filter(Boolean).join(" · ");
+  };
+  async function tgLoadDialogs() {
+    T.dialogs = await T.client.getDialogs({ limit: 80 });
+    if (cur === "tg" && T.view === "list") tgRenderList();
+  }
+  function tgRenderList() {
+    const out = el("button", { class: "sbtn" }, "Chiqiş");
+    out.onclick = async () => {
+      const ok = await new Promise((r) => (tg && tg.showConfirm ? tg.showConfirm(tr("Telegram akkauntidan chiqilsinmi? Seyfga saqlangan chatlar qoladi."), r) : r(confirm(tr("Telegram akkauntidan chiqilsinmi? Seyfga saqlangan chatlar qoladi.")))));
+      if (!ok) return;
+      try { await T.client.invoke(new T.G.Api.auth.LogOut()); } catch (_) {}
+      await api("/tg/session", { method: "DELETE" }).catch(() => {});
+      tgClose(); tgOpen();
+    };
+    const all = el("button", { class: "btn sec", style: "margin:4px 0 10px" }, "💾 Barça şaxsiy chatlarni seyfga saqlaş");
+    all.onclick = () => tgSaveAll(all);
+    const rows = T.dialogs.map((d) => el("div", { class: "dlg", onclick: () => tgOpenChat(d) },
+      el("div", { class: "av" }, (dName(d)[0] || "?").toUpperCase()),
+      el("div", { class: "g" }, el("div", { class: "n" }, (d.isChannel && !d.isGroup ? "📢 " : d.isGroup ? "👥 " : "") + dName(d)), el("div", { class: "m" }, mLabel(d.message))),
+      d.unreadCount ? el("span", { class: "u" }, String(d.unreadCount)) : null));
+    tgBox().replaceChildren(el("div", { class: "tg-head" }, el("h2", null, "💬 " + ([T.me && T.me.firstName, T.me && T.me.lastName].filter(Boolean).join(" ") || "Chatlar")), out), all, ...rows);
+  }
+
+  // ---- bitta chat: öqiş, yoziş, saqlaş
+  async function tgOpenChat(d) {
+    T.chat = d; T.view = "chat"; T.msgs = [];
+    tgBox().replaceChildren(el("div", { class: "skel" }), el("div", { class: "skel" }));
+    try {
+      const ms = await T.client.getMessages(d.entity, { limit: 50 });
+      T.msgs = [...ms].reverse();
+      tgRenderChat(true);
+      T.client.markAsRead(d.entity).catch(() => {});
+    } catch (e) { toast(tgErr(e)); T.view = "list"; tgRenderList(); }
+  }
+  function tgBubble(m) {
+    const d = T.chat;
+    const who = d && (d.isGroup) && !m.out && m.sender ? [m.sender.firstName, m.sender.lastName].filter(Boolean).join(" ") || m.sender.title || "" : "";
+    const media = m.media && !m.webPreview ? el("div", { class: "md", onclick: () => tgMedia(m) }, (m.photo ? "📷 Rasm" : m.video ? "🎬 Video" : m.voice ? "🎤 Ovozli xabar" : m.document ? "📎 " + ((m.file && m.file.name) || "Fayl") : "Media") + " — oçiş") : null;
+    return el("div", { class: "bub" + (m.out ? " out" : "") }, who ? el("div", { class: "who" }, who) : null, media, m.message ? el("div", { class: "text" }, m.message) : null,
+      el("div", { class: "t" }, fmtDate(new Date(m.date * 1000).toISOString())));
+  }
+  function tgRenderChat(scroll) {
+    const d = T.chat;
+    const back = el("button", { class: "icon-btn", onclick: () => { T.view = "list"; T.chat = null; tgLoadDialogs().catch(() => tgRenderList()); tgRenderList(); } }, "←");
+    const save = el("button", { class: "sbtn" }, "💾 Saqlaş");
+    save.onclick = () => tgSaveChat(d, save);
+    const older = el("button", { class: "sbtn", style: "align-self:center;margin:6px 0" }, "Oldingi xabarlar");
+    older.onclick = async () => {
+      if (!T.msgs.length) return;
+      older.disabled = true;
+      try { const ms = await T.client.getMessages(d.entity, { limit: 50, offsetId: T.msgs[0].id }); T.msgs = [...ms].reverse().concat(T.msgs); tgRenderChat(false); }
+      catch (e) { older.disabled = false; toast(tgErr(e)); }
+    };
+    const list = el("div", { class: "msgs" }, T.msgs.length >= 50 ? older : null, ...T.msgs.map(tgBubble));
+    const ta = el("textarea", { class: "inp", placeholder: tr("Xabar…"), rows: 1 });
+    const sendB = el("button", null, "➤");
+    sendB.onclick = async () => {
+      const text = ta.value.trim();
+      if (!text) return;
+      sendB.disabled = true;
+      try { const m = await T.client.sendMessage(d.entity, { message: text }); ta.value = ""; T.msgs.push(m); list.append(tgBubble(m)); window.scrollTo(0, document.body.scrollHeight); }
+      catch (e) { toast(tgErr(e)); }
+      sendB.disabled = false;
+    };
+    const canWrite = !(d.isChannel && !d.isGroup) || (d.entity && (d.entity.creator || d.entity.adminRights));
+    tgBox().replaceChildren(el("div", { class: "tg-head" }, back, el("h2", null, dName(d)), save), list, canWrite ? el("div", { class: "tg-send" }, ta, sendB) : "");
+    if (scroll) setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 30);
+  }
+  async function tgIncoming(ev) {
+    const m = ev.message;
+    if (T.view === "chat" && T.chat && m && String(m.chatId) === String(T.chat.id)) {
+      if (T.msgs.some((x) => x.id === m.id)) return;
+      T.msgs.push(m);
+      const list = tgBox().querySelector(".msgs");
+      if (list) { list.append(tgBubble(m)); window.scrollTo(0, document.body.scrollHeight); }
+      T.client.markAsRead(T.chat.entity).catch(() => {});
+    } else if (T.view === "list") {
+      clearTimeout(T._dl); T._dl = setTimeout(() => tgLoadDialogs().catch(() => {}), 800);
+    }
+  }
+  async function tgMedia(m) {
+    toast("Yuklanmoqda…");
+    try {
+      const buf = await T.client.downloadMedia(m, {});
+      const mime = m.photo ? "image/jpeg" : (m.file && m.file.mimeType) || "application/octet-stream";
+      const blob = new Blob([buf], { type: mime });
+      const name = (m.file && m.file.name) || (m.photo ? `rasm_${m.id}.jpg` : `fayl_${m.id}`);
+      const url = URL.createObjectURL(blob);
+      openSheet(el("h3", null, name), /^image\//.test(mime) ? el("img", { src: url, style: "width:100%;border-radius:12px" })
+        : /^video\//.test(mime) ? el("video", { src: url, controls: true, playsinline: true, style: "width:100%" })
+        : /^audio\/|ogg/.test(mime) ? el("audio", { src: url, controls: true, style: "width:100%" }) : null,
+        el("button", { class: "btn", onclick: async () => { await uploadEncrypted(new File([blob], name, { type: mime })); toast("Seyfga saqlandi (📁 Fayllar)"); } }, "💾 Seyfga saqlaş"));
+    } catch (e) { toast(tgErr(e)); }
+  }
+  const pad2 = (n) => String(n).padStart(2, "0");
+  const stamp = (t) => { const d = new Date(t * 1000); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
+  /** Chat tarixini (oldingi saqlangandan keyingilarini) matn qilib, media bilan birga seyfga şifrlab saqlaydi */
+  async function tgSaveChat(d, btn, opts = {}) {
+    if (T.busy) return toast("Saqlaş davom etmoqda…");
+    T.busy = true;
+    const key = String(d.id);
+    const from = Number(T.saved[key] || 0);
+    const name = dName(d);
+    const done = btn ? busy(btn, "Saqlanmoqda…") : () => {};
+    try {
+      const lines = [];
+      const media = [];
+      let maxId = from, n = 0;
+      for await (const m of T.client.iterMessages(d.entity, { reverse: true, minId: from, limit: 20000 })) {
+        n++;
+        const who = m.out ? (T.me.firstName || "Men") : (m.sender ? [m.sender.firstName, m.sender.lastName].filter(Boolean).join(" ") || m.sender.title || "" : name);
+        const ml = m.media && !m.webPreview ? `[${mLabel({ ...m, message: "" }) || "Media"}${m.file && m.file.name ? ": " + m.file.name : ""}] ` : "";
+        lines.push(`[${stamp(m.date)}] ${who}: ${ml}${m.message || ""}`);
+        if (!opts.textOnly && m.media && !m.webPreview && !m.sticker && media.length < 200 && (!m.file || !m.file.size || m.file.size < 50 * 1024 * 1024)) media.push(m);
+        if (m.id > maxId) maxId = m.id;
+        if (n % 200 === 0 && btn) btn.textContent = `Saqlanmoqda… ${n}`;
+      }
+      if (!n) { done(); T.busy = false; if (!opts.quiet) toast("Yangi xabar yöq — hammasi allaqaçon saqlangan"); return 0; }
+      const title = `${name} — chat ${from ? "(davomi) " : ""}${stamp(Date.now() / 1000).slice(0, 10)}.txt`.replace(/[\\/:*?"<>|]/g, " ");
+      const head = `Telegram chat: ${name}\nSaqlandi: ${stamp(Date.now() / 1000)} · ${n} ta xabar${from ? " (oldingi saqlaşdan keyingilari)" : ""}\n\n`;
+      await uploadEncrypted(new File([head + lines.join("\n")], title, { type: "text/plain" }));
+      let mi = 0;
+      for (const m of media) {
+        mi++;
+        if (btn) btn.textContent = `Media ${mi}/${media.length}…`;
+        try {
+          const buf = await T.client.downloadMedia(m, {});
+          if (!buf || !buf.length) continue;
+          const mime = m.photo ? "image/jpeg" : (m.file && m.file.mimeType) || "application/octet-stream";
+          const ext = m.photo ? "jpg" : ((m.file && m.file.ext) || "").replace(/^\./, "") || "bin";
+          const fname = `${name} — ${stamp(m.date).replace(":", "-")} — ${(m.file && m.file.name) || (m.photo ? "rasm" : "fayl") + "." + ext}`.replace(/[\\/:*?"<>|]/g, " ");
+          await uploadEncrypted(new File([buf], fname, { type: mime }));
+        } catch (_) { /* bitta media chiqmasa ham davom etamiz */ }
+      }
+      T.saved[key] = maxId;
+      await tgSaveSession();
+      done();
+      T.busy = false;
+      if (!opts.quiet) toast(`Seyfga saqlandi: ${n} ta xabar${media.length ? ", " + media.length + " ta media" : ""} (📁 Fayllar)`);
+      return n;
+    } catch (e) { done(); T.busy = false; toast(tgErr(e)); return 0; }
+  }
+  async function tgSaveAll(btn) {
+    const users = T.dialogs.filter((d) => d.isUser && !(d.entity && d.entity.bot));
+    let total = 0, i = 0;
+    for (const d of users) {
+      i++;
+      btn.textContent = `${i}/${users.length}: ${dName(d)}`;
+      total += await tgSaveChat(d, null, { quiet: true, textOnly: true });
+    }
+    btn.textContent = tr("💾 Barça şaxsiy chatlarni seyfga saqlaş");
+    toast(`Saqlandi: ${users.length} ta chat, ${total} ta yangi xabar (📁 Fayllar)`);
+  }
+
+  // ------------------------------------------------------------ kiriş kodi: har oçilganda 6 xonali kod yoki chizma
+  const LOCK = { token: null, info: null, hiddenAt: 0, waiting: null };
+  Object.assign(I18N.D, {"Kiriş kodini örnating": ["Установите код входа", "Set an entry code"], "Qora Quti har oçilganda şu kod söraladi.": ["Код будет запрашиваться при каждом открытии Qora Quti.", "Qora Quti will ask for this code every time it opens."], "🔢 6 xonali kod": ["🔢 6-значный код", "🔢 6-digit code"], "✍️ Chizmali kod": ["✍️ Графический ключ", "✍️ Pattern"], "6 xonali kod": ["6-значный код", "6-digit code"], "Chizmali kod": ["Графический ключ", "Pattern"], "Yangi kodni kiriting": ["Введите новый код", "Enter a new code"], "Kamida 4 ta nuqtani birlaştiring": ["Соедините минимум 4 точки", "Connect at least 4 dots"], "← Boşqa tur": ["← Другой тип", "← Other type"], "Tasdiqlaş uçun yana bir marta kiriting": ["Введите ещё раз для подтверждения", "Enter again to confirm"], "Kodlar mos kelmadi — qaytadan kiriting": ["Коды не совпали — введите заново", "Codes don't match — try again"], "Juda oddiy kod — boşqasini tanlang": ["Слишком простой код — выберите другой", "Code too simple — choose another"], "Kiriş kodi saqlandi": ["Код входа сохранён", "Entry code saved"], "Kiriş kodini kiriting": ["Введите код входа", "Enter your code"], "Chizmali kodni çizing": ["Нарисуйте графический ключ", "Draw your pattern"], "Kodni unutdingizmi?": ["Забыли код?", "Forgot the code?"], "Tekşirilmoqda…": ["Проверка…", "Checking…"], "Kodni tiklaş": ["Сброс кода", "Reset code"], "Seyf logini va master parolni kiriting — keyin yangi kod örnatasiz.": ["Введите логин сейфа и мастер-пароль — затем установите новый код.", "Enter your vault login and master password, then set a new code."], "Tasdiqlaş": ["Подтвердить", "Confirm"], "Tasdiqlandi — yangi kod örnating": ["Подтверждено — установите новый код", "Confirmed — set a new code"], "Login yoki master parol notöğri": ["Неверный логин или мастер-пароль", "Wrong login or master password"], "Tiklaşni söraş (24 soat)": ["Запросить сброс (24 часа)", "Request reset (24 hours)"], "Sörov qabul qilindi — botga xabar yuborildi": ["Запрос принят — бот прислал уведомление", "Request accepted — the bot sent a notice"], "← Orqaga": ["← Назад", "← Back"], "🔐 Kiriş kodi": ["🔐 Код входа", "🔐 Entry code"], "Har oçilganda va ilova 1 daqiqadan köp fonda tursa söraladi": ["Запрашивается при каждом открытии и после 1 минуты в фоне", "Asked on every open and after 1 minute in the background"], "Özgartiriş": ["Изменить", "Change"], "🌍 Begona kanalni arxivlaş": ["🌍 Архивировать чужой канал", "🌍 Archive any public channel"], "Arxivga qöşiş": ["Добавить в архив", "Add to archive"], "Kanal tekşirilmoqda…": ["Проверка канала…", "Checking channel…"], "🌍 Begona kanal": ["🌍 Чужой канал", "🌍 Other channel"], "➕ Öz kanalim": ["➕ Мой канал", "➕ My channel"], "🌍 Begona ochiq kanalni arxivlaş": ["🌍 Архивировать открытый канал", "🌍 Archive a public channel"], "Kanal topilmadi yoki yopiq (faqat ochiq kanallarni qöşiş mumkin)": ["Канал не найден или закрыт (можно только открытые)", "Channel not found or private (public channels only)"], "Bu kanal allaqaçon qöşilgan": ["Этот канал уже добавлен", "This channel is already added"], "Kanal va uning arxivi öçirilsinmi?": ["Удалить канал и его архив?", "Delete the channel and its archive?"], "Istalgan OCHIQ kanalni (sizniki bölmasa ham) qöşing: oxirgi postlar darhol, butun eski tarixi va yangilari avtomatik saqlanadi. Kanal öçirilsa yoki bloklansa ham, şu kungaça saqlangan hamma narsa arxivda qoladi. Bot kanalga qöşilmaydi, kanal egasi bilmaydi.": ["Добавьте любой ОТКРЫТЫЙ канал (даже не ваш): последние посты сразу, вся старая история и новые — автоматически. Даже если канал удалят или заблокируют, всё сохранённое до этого дня останется в архиве. Бот не вступает в канал, владелец не узнает.", "Add any PUBLIC channel (even not yours): latest posts right away, its whole older history and new ones automatically. Even if the channel is deleted or blocked, everything saved up to that day stays in your archive. The bot doesn't join; the owner won't know."], "Endi qayta urinib köring": ["Теперь попробуйте снова", "Try again now"]});
+  const LOCK_ITER = 150000;
+  const lockDur = (s) => s >= 3600 ? `${Math.floor(s / 3600)} soat ${Math.floor((s % 3600) / 60)} daqiqa` : s >= 60 ? `${Math.ceil(s / 60)} daqiqa` : `${s} soniya`;
+  async function lockSecret(kind, raw, salt) { return pbkdfHex(`qq-lock-v1\n${kind}\n${raw}`, B64.dec(salt), LOCK_ITER); }
+  function lockEl() {
+    let d = $("lock");
+    if (!d) { d = el("div", { id: "lock" }); document.body.append(d); }
+    d.hidden = false;
+    return d;
+  }
+  function lockHide() { const d = $("lock"); if (d) { d.hidden = true; d.replaceChildren(); } }
+  /** 🔐 Seyf eshigi ochilishi (motion): g'ildirak aylanadi, zulfinlar chiqadi, eshik ochilib yorug'lik tushadi. */
+  function vaultFx() {
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const old = $("vfx"); if (old) old.remove();
+    const fx = el("div", { id: "vfx" }, el("div", { class: "vlight" }),
+      el("div", { class: "vdoor" }, el("div", { class: "ring r1" }), el("div", { class: "ring r2" }),
+        el("div", { class: "wheel" }, el("i"), el("i"), el("i")), el("div", { class: "bolt b1" }), el("div", { class: "bolt b2" }), el("div", { class: "bolt b3" })));
+    document.body.append(fx);
+    try { tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred("heavy"); setTimeout(() => { try { tg.HapticFeedback.notificationOccurred("success"); } catch (_) {} }, 950); } catch (_) {}
+    setTimeout(() => fx.remove(), 2200);
+  }
+  const lockHead = (title, sub) => [el("div", { class: "logo", style: "width:54px;height:54px;border-radius:14px" }, el("i", { style: "width:16px;height:16px" })),
+    el("h2", null, title), el("div", { class: "sub", id: "lkSub" }, sub || "")];
+  function lockMsg(t, bad) { const s = $("lkSub"); if (s) { s.textContent = tr(t); s.className = "sub" + (bad ? " err" : ""); } }
+  const haptic = (t) => { try { tg && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred(t); } catch (_) {} };
+
+  // 6 xonali kod klaviaturasi
+  function pinPad(onDone, extra) {
+    let v = "";
+    const dots = el("div", { class: "pdots" }, ...Array.from({ length: 6 }, () => el("i")));
+    const paint = () => [...dots.children].forEach((d, i) => d.classList.toggle("on", i < v.length));
+    const key = (k) => {
+      if (k === "⌫") v = v.slice(0, -1);
+      else if (v.length < 6) v += k;
+      paint();
+      if (v.length === 6) { const x = v; setTimeout(() => { v = ""; paint(); onDone(x, dots); }, 120); }
+    };
+    const keys = el("div", { class: "pkeys" }, ..."123456789".split("").map((k) => el("button", { onclick: () => key(k) }, k)),
+      extra || el("span"), el("button", { onclick: () => key("0") }, "0"), el("button", { class: "ghost", onclick: () => key("⌫") }, "⌫"));
+    return [dots, keys];
+  }
+  // 3×3 chizmali kod
+  function patternPad(onDone) {
+    const box = el("div", { class: "pat" });
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", "0 0 264 264");
+    const pts = [];
+    for (let i = 0; i < 9; i++) {
+      const x = 44 + (i % 3) * 88, y = 44 + Math.floor(i / 3) * 88;
+      const d = el("i", { style: `left:${x}px;top:${y}px` });
+      pts.push({ x, y, d });
+      box.append(d);
+    }
+    box.prepend(svg);
+    let seq = [], drawing = false, cur = null;
+    const draw = () => {
+      svg.replaceChildren();
+      const all = seq.map((i) => pts[i]).concat(cur ? [cur] : []);
+      for (let i = 1; i < all.length; i++) {
+        const l = document.createElementNS(svgNS, "line");
+        l.setAttribute("x1", all[i - 1].x); l.setAttribute("y1", all[i - 1].y); l.setAttribute("x2", all[i].x); l.setAttribute("y2", all[i].y);
+        l.setAttribute("stroke", "var(--accent)"); l.setAttribute("stroke-width", "6"); l.setAttribute("stroke-linecap", "round");
+        svg.append(l);
+      }
+      pts.forEach((p, i) => p.d.classList.toggle("on", seq.includes(i)));
+    };
+    const pos = (e) => { const r = box.getBoundingClientRect(); return { x: (e.clientX - r.left) * 264 / r.width, y: (e.clientY - r.top) * 264 / r.height }; };
+    const hit = (p) => {
+      const i = pts.findIndex((q) => Math.hypot(q.x - p.x, q.y - p.y) < 30);
+      if (i < 0 || seq.includes(i)) return;
+      // oradagi nuqtani ham qöşamiz (1→3 bölsa 2 ham)
+      const last = seq[seq.length - 1];
+      if (last !== undefined) {
+        const mx = (pts[last].x + pts[i].x) / 2, my = (pts[last].y + pts[i].y) / 2;
+        const mid = pts.findIndex((q) => q.x === mx && q.y === my);
+        if (mid >= 0 && !seq.includes(mid)) seq.push(mid);
+      }
+      seq.push(i);
+      try { tg && tg.HapticFeedback && tg.HapticFeedback.selectionChanged && tg.HapticFeedback.selectionChanged(); } catch (_) {}
+    };
+    box.addEventListener("pointerdown", (e) => { e.preventDefault(); drawing = true; seq = []; box.setPointerCapture(e.pointerId); hit(pos(e)); cur = pos(e); draw(); });
+    box.addEventListener("pointermove", (e) => { if (!drawing) return; const p = pos(e); hit(p); cur = p; draw(); });
+    const end = () => {
+      if (!drawing) return;
+      drawing = false; cur = null; draw();
+      const s = seq.slice();
+      setTimeout(() => { seq = []; draw(); }, 250);
+      if (s.length < 4) { lockMsg("Kamida 4 ta nuqtani birlaştiring", true); haptic("error"); return; }
+      onDone(s.map((i) => i + 1).join("-"), box);
+    };
+    box.addEventListener("pointerup", end);
+    box.addEventListener("pointercancel", end);
+    return [box];
+  }
+  function lockFail(node, msg) {
+    haptic("error");
+    if (node) { node.classList.remove("shake"); void node.offsetWidth; node.classList.add("shake"); }
+    lockMsg(msg, true);
+  }
+
+  // Yangi kod örnatiş (birinçi marta yoki özgartiriş)
+  function lockSetup(done, canCancel) {
+    const d = lockEl();
+    const choose = () => d.replaceChildren(...lockHead("Kiriş kodini örnating", "Qora Quti har oçilganda şu kod söraladi."),
+      el("div", { class: "lk-choice" },
+        el("button", { class: "btn", onclick: () => enter("pin") }, "🔢 6 xonali kod"),
+        el("button", { class: "btn sec", onclick: () => enter("pattern") }, "✍️ Chizmali kod"),
+        canCancel ? el("button", { class: "btn sec", onclick: () => { lockHide(); done(false); } }, "Bekor qiliş") : null));
+    const enter = (kind) => {
+      let first = null;
+      const onDone = async (raw, node) => {
+        if (!first) {
+          if (kind === "pin" && /^(\d)\1{5}$|^(012345|123456|234567|345678|456789|987654|876543|765432|654321|543210)$/.test(raw)) return lockFail(node, "Juda oddiy kod — boşqasini tanlang");
+          first = raw;
+          lockMsg("Tasdiqlaş uçun yana bir marta kiriting");
+          return;
+        }
+        if (raw !== first) { first = null; return lockFail(node, "Kodlar mos kelmadi — qaytadan kiriting"); }
+        lockMsg("Saqlanmoqda…");
+        try {
+          const salt = B64.enc(rand(16));
+          const r = await api("/lock/set", { method: "POST", body: { kind, salt, secret: await lockSecret(kind, raw, salt) } });
+          LOCK.token = r.token;
+          LOCK.info = { has: true, kind, salt };
+          haptic("success");
+          lockHide();
+          toast("Kiriş kodi saqlandi");
+          done(true);
+        } catch (e) { first = null; lockFail(node, e.status === 423 ? "Avval joriy kodni kiriting" : "Saqlab bölmadi — qayta urinib köring"); }
+      };
+      d.replaceChildren(...lockHead(kind === "pin" ? "6 xonali kod" : "Chizmali kod", kind === "pin" ? "Yangi kodni kiriting" : "Kamida 4 ta nuqtani birlaştiring"),
+        ...(kind === "pin" ? pinPad(onDone) : patternPad(onDone)),
+        el("button", { class: "lk-link", onclick: choose }, "← Boşqa tur"));
+    };
+    choose();
+  }
+
+  // Kodni kiritiş
+  function lockUnlock(done) {
+    const d = lockEl();
+    const info = LOCK.info;
+    const onDone = async (raw, node) => {
+      if (LOCK.waiting) return;
+      lockMsg("Tekşirilmoqda…");
+      try {
+        const r = await api("/lock/check", { method: "POST", body: { secret: await lockSecret(info.kind, raw, info.salt) } });
+        LOCK.token = r.token;
+        vaultFx();
+        lockHide();
+        done(true);
+      } catch (e) {
+        const w = e.data && e.data.wait;
+        if (w) return lockCountdown(w, node);
+        lockFail(node, e.status === 403 ? `Notöğri kod. Yana ${e.data && e.data.left != null ? e.data.left : "bir necha"} ta urinish` : "Ulanib bölmadi — qayta urinib köring");
+      }
+    };
+    const pad = info.kind === "pattern" ? patternPad(onDone) : pinPad(onDone);
+    const reset = info.reset_in != null ? (info.reset_in > 0 ? `Kodni tiklaş sörovi: ${lockDur(info.reset_in)} qoldi` : "") : "";
+    d.replaceChildren(...lockHead("Qora Quti", info.kind === "pattern" ? "Chizmali kodni çizing" : "Kiriş kodini kiriting"), ...pad,
+      el("button", { class: "lk-link", onclick: () => lockForgot(done) }, "Kodni unutdingizmi?"),
+      reset ? el("div", { class: "note", style: "margin-top:10px" }, reset) : "");
+    if (info.wait > 0) lockCountdown(info.wait);
+  }
+  function lockCountdown(sec, node) {
+    lockFail(node, "");
+    clearInterval(LOCK.waiting);
+    const end = Date.now() + sec * 1000;
+    const tick = () => {
+      const left = Math.ceil((end - Date.now()) / 1000);
+      if (left <= 0) { clearInterval(LOCK.waiting); LOCK.waiting = null; lockMsg("Endi qayta urinib köring"); return; }
+      lockMsg(`Köp xato urinish. ${lockDur(left)} kuting`, true);
+    };
+    LOCK.waiting = setInterval(tick, 1000);
+    tick();
+  }
+  function lockForgot(done) {
+    const d = lockEl();
+    const back = el("button", { class: "lk-link", onclick: () => lockUnlock(done) }, "← Orqaga");
+    if (LOCK.info.reset_in === 0) {
+      return lockSetup(done, false);
+    }
+    if (LOCK.info.login) {
+      const lg = el("input", { class: "inp", value: LOCK.info.login, autocomplete: "off", autocapitalize: "none", spellcheck: "false" });
+      const pw = el("input", { class: "inp", type: "password", placeholder: tr("Master parol"), style: "margin-top:10px" });
+      const b = el("button", { class: "btn" }, "Tasdiqlaş");
+      b.onclick = async () => {
+        const login = normLogin(lg.value);
+        if (!login || !pw.value) return toast("Login va master parolni kiriting");
+        const stop = busy(b, "Tekşirilmoqda…");
+        try {
+          const st = await api("/auth/salt", { method: "POST", body: { login } });
+          const proof = await pbkdfHex(pw.value, B64.dec(st.salt), st.iterations || ITER);
+          await api("/lock/reset", { method: "POST", body: { login, proof } });
+          LOCK.info = { has: false };
+          stop();
+          toast("Tasdiqlandi — yangi kod örnating");
+          lockSetup(done, false);
+        } catch (e) { stop(); toast(e.message === "rate" ? "Köp urinish — ertaga qayta urinib köring" : "Login yoki master parol notöğri"); }
+      };
+      return d.replaceChildren(...lockHead("Kodni tiklaş", "Seyf logini va master parolni kiriting — keyin yangi kod örnatasiz."),
+        el("div", { style: "width:100%;max-width:340px;text-align:left" }, lg, pw, b), back);
+    }
+    const b = el("button", { class: "btn" }, "Tiklaşni söraş (24 soat)");
+    b.onclick = async () => {
+      const stop = busy(b, "Yuborilmoqda…");
+      try {
+        const r = await api("/lock/reset_request", { method: "POST", body: {} });
+        LOCK.info.reset_in = r.reset_in;
+        stop();
+        toast("Sörov qabul qilindi — botga xabar yuborildi");
+        lockUnlock(done);
+      } catch (_) { stop(); toast("Yuborib bölmadi"); }
+    };
+    d.replaceChildren(...lockHead("Kodni tiklaş", "Seyfda login örnatilmagan. Xavfsizlik uçun tiklaş 24 soatdan keyin oçiladi; bu orada botga ogohlantiriş keladi. Kodni eslab qolsangiz — kiritsangiz sörov bekor böladi."),
+      el("div", { style: "width:100%;max-width:340px" }, b), back);
+  }
+
+  /** Ilovaga kiriş: kod örnatilmagan bölsa — örnatiş, bölsa — kiritiş. */
+  async function lockGate() {
+    if (LOCK.token) return;
+    LOCK.info = await api("/lock/status");
+    if (LOCK.info.has && LOCK.info.reset_in === 0) LOCK.info.reset_in = 0;
+    await new Promise((resolve) => (LOCK.info.has ? lockUnlock(resolve) : lockSetup(resolve, false)));
+  }
+  // Ilova fonga ketib, 60 soniyadan keyin qaytsa — kod qayta söraladi
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) { LOCK.hiddenAt = Date.now(); return; }
+    if (LOCK.token && LOCK.hiddenAt && Date.now() - LOCK.hiddenAt > 60_000) {
+      LOCK.token = null;
+      lockGate().catch(() => {});
+    }
+  });
+  function lockSettings() {
+    return [el("h3", null, "🔐 Kiriş kodi"),
+      el("div", { class: "row" }, el("div", { class: "grow" }, el("div", { class: "t" }, LOCK.info && LOCK.info.kind === "pattern" ? "Chizmali kod" : "6 xonali kod"),
+        el("div", { class: "s" }, "Har oçilganda va ilova 1 daqiqadan köp fonda tursa söraladi")),
+      el("button", { class: "sbtn", onclick: () => { closeSheet(); lockSetup(() => {}, true); } }, "Özgartiriş"))];
+  }
+
+  // ------------------------------------------------------------ begona (ochiq) kanal qöşiş
+  function followSheet() {
+    const inp = el("input", { class: "inp", placeholder: "@kanal yoki https://t.me/kanal", autocomplete: "off", autocapitalize: "none", spellcheck: "false" });
+    const b = el("button", { class: "btn" }, "Arxivga qöşiş");
+    b.onclick = async () => {
+      if (!inp.value.trim()) return toast("Kanal manzilini yozing");
+      const stop = busy(b, "Kanal tekşirilmoqda…");
+      try {
+        const r = await api("/follow", { method: "POST", body: { name: inp.value.trim() } });
+        stop();
+        toast(`«${r.title}» qöşildi: ${r.posts} ta post`);
+        await loadMe();
+        state.channel = r.id;
+        closeSheet();
+        renderHeader();
+        switchTab("channels");
+        loadPosts(true);
+      } catch (e) {
+        stop();
+        toast({ name: "Kanal manzili notöğri", private: "Kanal topilmadi yoki yopiq (faqat ochiq kanallarni qöşiş mumkin)", exists: "Bu kanal allaqaçon qöşilgan",
+          limit: `Köpi bilan ${e.data && e.data.limit} ta begona kanal` }[e.message] || "Qöşib bölmadi");
+      }
+    };
+    openSheet(el("h3", null, "🌍 Begona kanalni arxivlaş"),
+      el("div", { class: "note", style: "margin:-6px 0 12px" }, "Istalgan OCHIQ kanalni (sizniki bölmasa ham) qöşing: oxirgi postlar darhol, butun eski tarixi va yangilari avtomatik saqlanadi. Kanal öçirilsa yoki bloklansa ham, şu kungaça saqlangan hamma narsa arxivda qoladi. Bot kanalga qöşilmaydi, kanal egasi bilmaydi."),
+      inp, b);
   }
 
   async function boot() {
@@ -2167,6 +2841,7 @@
     }
     $("tabVault").replaceChildren(el("div", { class: "skel" }), el("div", { class: "skel" }));
     try {
+      await lockGate();
       await Promise.all([loadMe(), loadKeys()]);
       try { V.transfer = await api("/recovery/status"); } catch (_) {}
     } catch (e) {
@@ -2180,7 +2855,7 @@
     let t = "vault";
     try { t = localStorage.getItem("qq_tab") || "vault"; } catch (_) {}
     if (location.hash === "#tiklash") t = "vault";
-    switchTab(["vault", "files", "channels"].includes(t) ? t : "vault");
+    switchTab(["vault", "files", "channels", "tg"].includes(t) ? t : "vault");
     if (location.hash === "#tiklash") { try { history.replaceState(null, "", location.pathname + location.search); } catch (_) {} idRecoverFlow(); }
   }
   boot();
