@@ -1042,6 +1042,7 @@
       transfer_hash: await transferHash(rk) };
     await api("/vault/keys", { method: "POST", body });
     V.dek = await importDek(dekRaw);
+    await codeEnroll(dekRaw).catch((e) => console.error("code", e));
     dekRaw.fill(0);
     await loadKeys();
     await ensureKeyPair().catch((e) => console.error("keypair", e));
@@ -1069,13 +1070,14 @@
     await api("/vault/keys", { method: "POST", body });
     await loadKeys();
   }
-  async function unlockWith(dekRaw) {
+  async function unlockWith(dekRaw, quiet) {
     V.dek = await importDek(dekRaw);
+    await codeEnroll(dekRaw).catch((e) => console.error("code", e));
     dekRaw.fill(0);
     V.last = Date.now();
     await ensureKeyPair().catch((e) => console.error("keypair", e));
     await loadItems();
-    vaultFx();
+    if (!quiet) vaultFx();
     if (cur === "files") loadFiles().catch(() => {});
   }
   function lock(silent) {
@@ -1088,7 +1090,36 @@
     if (!silent) toast("Seyf qulflandi");
   }
   ["pointerdown", "keydown", "scroll"].forEach((ev) => document.addEventListener(ev, () => { V.last = Date.now(); }, { passive: true }));
-  setInterval(() => { if (V.dek && Date.now() - V.last > AUTOLOCK_MS) lock(); }, 15000);
+  setInterval(() => { if (V.dek && Date.now() - V.last > AUTOLOCK_MS) relock(); }, 15000);
+
+  // 🔐 Bitta parol: seyf kiriş kodi (6 xonali yoki chizma) bilan oçiladi. Bu qurilmada bir marta master parol kiritilgach,
+  // DEK tasodifiy qurilma kaliti bilan o'raladi: o'ralgan nusxa serverda (faqat to'g'ri kiriş kodidan keyin beriladi),
+  // qurilma kaliti esa faqat şu telefonda. Ikkalasi birga bölmasa seyf oçilmaydi — server ham, telefon ham yolg'iz oça olmaydi.
+  const CK = "qq_ck";
+  const ckGet = () => { try { const v = JSON.parse(localStorage.getItem(CK) || "null"); return v && state.me && v.uid === state.me.user.id ? v : null; } catch (_) { return null; } };
+  const ckDrop = () => { try { localStorage.removeItem(CK); } catch (_) {} };
+  async function codeEnroll(dekRaw) {
+    if (!LOCK.info || !LOCK.info.has || !state.me || ckGet()) return;
+    const k = rand(32), dev = "code-" + toHex(rand(12));
+    await api("/bio/save", { method: "POST", body: { device_id: dev, wrapped: B64.enc(await seal(await importDek(k), dekRaw, "qq:code")) } });
+    try { localStorage.setItem(CK, JSON.stringify({ uid: state.me.user.id, dev, k: B64.enc(k) })); } catch (_) {}
+  }
+  async function codeUnlock() {
+    const c = ckGet();
+    if (!c || V.dek || !V.keys || !V.keys.exists) return false;
+    try {
+      const r = await api(`/bio/get?device=${encodeURIComponent(c.dev)}`);
+      if (!r.wrapped) { ckDrop(); return false; }
+      await unlockWith(await unseal(await importDek(B64.dec(c.k)), B64.dec(r.wrapped), "qq:code"), true);
+      if (cur === "vault") renderVault();
+      return true;
+    } catch (e) { if (e && e.status !== 423 && !(e instanceof TypeError)) ckDrop(); return false; }
+  }
+  /** Seyfni qulflab, qayta oçiş uçun kiriş kodini söraydi. */
+  function relock() {
+    lock();
+    if (LOCK.info && LOCK.info.has) { LOCK.token = null; lockGate().then(() => codeUnlock()).catch(() => {}); }
+  }
   // Ilovalar ro'yxatidagi kichik rasmda (app switcher) seyf ko'rinmasin
   const shield = (on) => { const sh = $("shield"); if (sh) sh.hidden = !on; };
   window.addEventListener("blur", () => { if (V.dek) shield(true); });
@@ -1154,7 +1185,7 @@
       Object.entries(TYPES).filter(([k]) => counts[k]).map(([k, t]) =>
         el("button", { class: "chip" + (V.filter === k ? " on" : ""), onclick: () => { V.filter = k; renderVault(); } }, `${t.ic} ${SHORT[k] || t.name} ${counts[k]}`)));
     const top = el("div", null, el("div", { class: "bar2", style: "margin-top:4px" }, search,
-      el("button", { class: "icon-btn", "aria-label": "Qulflaş", onclick: () => lock() }, "🔒")),
+      el("button", { class: "icon-btn", "aria-label": "Qulflaş", onclick: () => relock() }, "🔒")),
       V.keys.login ? null : el("button", { class: "warn", style: "margin-top:10px;width:100%", onclick: loginSetup },
         "👤 Seyf uçun login tanlang — boşqa Telegram akkauntdan kiriş va pasport bilan parolni tiklaş uçun kerak. Bosing →"),
       V.keys.login && !V.keys.has_idrec ? el("button", { class: "info", style: "margin-top:10px;width:100%;text-align:left", onclick: idrecSetup },
@@ -1251,7 +1282,7 @@
     });
     return el("div", { class: "lockbox" },
       el("div", { class: "big" }, "🔒"), el("h2", null, "Seyf qulflangan"),
-      el("p", null, "Oçiş uçun master parolni kiriting."),
+      el("p", null, ckGet() ? "Oçiş uçun master parolni kiriting." : "Bu qurilmada bir marta master parolni kiriting — keyin seyf faqat kiriş kodi bilan oçiladi."),
       bioBtn, faceBtn, p.row, btn,
       V.transfer && V.transfer.pending ? el("div", { class: "info", style: "margin-top:12px" },
         `⏳ Tiklaş so'rovi bor: ${fmtDate(V.transfer.ready_at)} da oçiladi.`) : null,
@@ -2027,7 +2058,7 @@
               try { await api("/backup/disable", { method: "POST", body: {} }); await loadKeys(); closeSheet(); toast("Gmail tiklaş öçirildi"); } catch (_) { toast("Bajarib bölmadi"); }
             } }, "Öçiriş"))
         : el("button", { class: "btn sec", onclick: emailBackupSetup }, "📧 Gmail orqali tiklaşni yoqiş")) : null,
-      V.dek ? el("button", { class: "btn sec", onclick: () => lock() }, "🔒 Hozir qulflaş") : null,
+      V.dek ? el("button", { class: "btn sec", onclick: () => relock() }, "🔒 Hozir qulflaş") : null,
       el("div", { style: "height:18px" })];
   }
 
@@ -2138,9 +2169,10 @@
       acts.push(open);
     } else if (f.status === "tg_only" || f.status === "stored" || f.status === "pending") {
       const send = el("button", { class: "btn" }, "📤 Bot çatiga yuboriş");
-      send.onclick = async () => { const done = busy(send, "Yuborilmoqda…"); try { await api("/files/send", { method: "POST", body: { id: f.id } }); toast("Bot çatiga yuborildi (himoyalangan)"); closeSheet(); } catch (_) { toast("Yuborib bölmadi"); } done(); };
+      send.onclick = async () => { if (!(await lockConfirm("Faylni bot çatiga çiqariş uçun kiriş kodini kiriting"))) return; const done = busy(send, "Yuborilmoqda…"); try { await api("/files/send", { method: "POST", body: { id: f.id } }); toast("Bot çatiga yuborildi (himoyalangan)"); closeSheet(); } catch (_) { toast("Yuborib bölmadi"); } done(); };
       acts.push(send);
       if (f.status === "stored") acts.push(el("button", { class: "btn sec", onclick: async () => {
+        if (!(await lockConfirm("Faylni yuklab oliş uçun kiriş kodini kiriting"))) return;
         try { const r = await api(`/files/download?id=${f.id}&download=1`); if (tg && tg.downloadFile && tg.isVersionAtLeast && tg.isVersionAtLeast("8.0")) tg.downloadFile({ url: r.url, file_name: fileName(f) }); else openLink(r.url); }
         catch (_) { toast("Yuklab bölmadi"); } } }, "⬇️ Zaxira nusxani yuklaş"));
       if (f.status === "tg_only") acts.push(el("div", { class: "note", style: "margin-top:8px" }, "Fayl 20 MB dan katta: u Telegram bulutida turadi, bot uni faqat sizga himoyalangan holda qayta yuboradi."));
@@ -2182,6 +2214,11 @@
     else if (/^text\/|json/.test(blob.type) && blob.size < 2e6) { view = el("pre"); blob.text().then((t) => { view.textContent = t; }); }
     const ext = ({ "image/jpeg": ".jpg", "video/mp4": ".mp4", "audio/ogg": ".ogg" })[blob.type] || "";
     const save = el("a", { class: "btn sec", href: url, download: meta.name || ("qora_quti_" + f.id + ext) }, "⬇️ Qurilmaga saqlaş");
+    save.onclick = (e) => {
+      if (save.dataset.ok === "1") { save.dataset.ok = ""; return; }
+      e.preventDefault();
+      lockConfirm("Faylni qurilmaga saqlaş uçun kiriş kodini kiriting").then((ok) => { if (ok) { save.dataset.ok = "1"; save.click(); } });
+    };
     openSheet(el("h3", null, fileName(f)), el("div", { class: "preview" }, view || el("div", { class: "info" }, "Bu fayl turini şu yerda körsatib bölmaydi. Qurilmaga saqlang.")), save);
   }
 
@@ -2563,6 +2600,12 @@
 
   // ------------------------------------------------------------ kiriş kodi: har oçilganda 6 xonali kod yoki chizma
   const LOCK = { token: null, info: null, hiddenAt: 0, waiting: null };
+  Object.assign(I18N.D, {"Tasdiqlang": ["Подтвердите", "Confirm"], "Bekor qiliş": ["Отмена", "Cancel"],
+    "Ma'lumotni çiqarib oliş uçun kiriş kodini kiriting": ["Введите код входа, чтобы извлечь данные", "Enter your entry code to take data out"],
+    "Faylni qurilmaga saqlaş uçun kiriş kodini kiriting": ["Введите код входа, чтобы сохранить файл на устройство", "Enter your entry code to save the file to the device"],
+    "Faylni yuklab oliş uçun kiriş kodini kiriting": ["Введите код входа, чтобы скачать файл", "Enter your entry code to download the file"],
+    "Faylni bot çatiga çiqariş uçun kiriş kodini kiriting": ["Введите код входа, чтобы отправить файл в чат бота", "Enter your entry code to send the file to the bot chat"],
+    "Bu qurilmada bir marta master parolni kiriting — keyin seyf faqat kiriş kodi bilan oçiladi.": ["Введите мастер-пароль на этом устройстве один раз — дальше сейф открывается только кодом входа.", "Enter the master password once on this device — after that the vault opens with your entry code only."]});
   Object.assign(I18N.D, {"Kiriş kodini örnating": ["Установите код входа", "Set an entry code"], "Qora Quti har oçilganda şu kod söraladi.": ["Код будет запрашиваться при каждом открытии Qora Quti.", "Qora Quti will ask for this code every time it opens."], "🔢 6 xonali kod": ["🔢 6-значный код", "🔢 6-digit code"], "✍️ Chizmali kod": ["✍️ Графический ключ", "✍️ Pattern"], "6 xonali kod": ["6-значный код", "6-digit code"], "Chizmali kod": ["Графический ключ", "Pattern"], "Yangi kodni kiriting": ["Введите новый код", "Enter a new code"], "Kamida 4 ta nuqtani birlaştiring": ["Соедините минимум 4 точки", "Connect at least 4 dots"], "← Boşqa tur": ["← Другой тип", "← Other type"], "Tasdiqlaş uçun yana bir marta kiriting": ["Введите ещё раз для подтверждения", "Enter again to confirm"], "Kodlar mos kelmadi — qaytadan kiriting": ["Коды не совпали — введите заново", "Codes don't match — try again"], "Juda oddiy kod — boşqasini tanlang": ["Слишком простой код — выберите другой", "Code too simple — choose another"], "Kiriş kodi saqlandi": ["Код входа сохранён", "Entry code saved"], "Kiriş kodini kiriting": ["Введите код входа", "Enter your code"], "Chizmali kodni çizing": ["Нарисуйте графический ключ", "Draw your pattern"], "Kodni unutdingizmi?": ["Забыли код?", "Forgot the code?"], "Tekşirilmoqda…": ["Проверка…", "Checking…"], "Kodni tiklaş": ["Сброс кода", "Reset code"], "Seyf logini va master parolni kiriting — keyin yangi kod örnatasiz.": ["Введите логин сейфа и мастер-пароль — затем установите новый код.", "Enter your vault login and master password, then set a new code."], "Tasdiqlaş": ["Подтвердить", "Confirm"], "Tasdiqlandi — yangi kod örnating": ["Подтверждено — установите новый код", "Confirmed — set a new code"], "Login yoki master parol notöğri": ["Неверный логин или мастер-пароль", "Wrong login or master password"], "Tiklaşni söraş (24 soat)": ["Запросить сброс (24 часа)", "Request reset (24 hours)"], "Sörov qabul qilindi — botga xabar yuborildi": ["Запрос принят — бот прислал уведомление", "Request accepted — the bot sent a notice"], "← Orqaga": ["← Назад", "← Back"], "🔐 Kiriş kodi": ["🔐 Код входа", "🔐 Entry code"], "Har oçilganda va ilova 1 daqiqadan köp fonda tursa söraladi": ["Запрашивается при каждом открытии и после 1 минуты в фоне", "Asked on every open and after 1 minute in the background"], "Özgartiriş": ["Изменить", "Change"], "🌍 Begona kanalni arxivlaş": ["🌍 Архивировать чужой канал", "🌍 Archive any public channel"], "Arxivga qöşiş": ["Добавить в архив", "Add to archive"], "Kanal tekşirilmoqda…": ["Проверка канала…", "Checking channel…"], "🌍 Begona kanal": ["🌍 Чужой канал", "🌍 Other channel"], "➕ Öz kanalim": ["➕ Мой канал", "➕ My channel"], "🌍 Begona ochiq kanalni arxivlaş": ["🌍 Архивировать открытый канал", "🌍 Archive a public channel"], "Kanal topilmadi yoki yopiq (faqat ochiq kanallarni qöşiş mumkin)": ["Канал не найден или закрыт (можно только открытые)", "Channel not found or private (public channels only)"], "Bu kanal allaqaçon qöşilgan": ["Этот канал уже добавлен", "This channel is already added"], "Kanal va uning arxivi öçirilsinmi?": ["Удалить канал и его архив?", "Delete the channel and its archive?"], "Istalgan OCHIQ kanalni (sizniki bölmasa ham) qöşing: oxirgi postlar darhol, butun eski tarixi va yangilari avtomatik saqlanadi. Kanal öçirilsa yoki bloklansa ham, şu kungaça saqlangan hamma narsa arxivda qoladi. Bot kanalga qöşilmaydi, kanal egasi bilmaydi.": ["Добавьте любой ОТКРЫТЫЙ канал (даже не ваш): последние посты сразу, вся старая история и новые — автоматически. Даже если канал удалят или заблокируют, всё сохранённое до этого дня останется в архиве. Бот не вступает в канал, владелец не узнает.", "Add any PUBLIC channel (even not yours): latest posts right away, its whole older history and new ones automatically. Even if the channel is deleted or blocked, everything saved up to that day stays in your archive. The bot doesn't join; the owner won't know."], "Endi qayta urinib köring": ["Теперь попробуйте снова", "Try again now"]});
   const LOCK_ITER = 150000;
   const lockDur = (s) => s >= 3600 ? `${Math.floor(s / 3600)} soat ${Math.floor((s % 3600) / 60)} daqiqa` : s >= 60 ? `${Math.ceil(s / 60)} daqiqa` : `${s} soniya`;
@@ -2782,6 +2825,33 @@
       el("div", { style: "width:100%;max-width:340px" }, b), back);
   }
 
+  /** Ma'lumotni seyfdan çiqarib oliş (qurilmaga saqlaş, yuklaş, yuboriş) oldidan kiriş kodini qayta söraydi. */
+  function lockConfirm(why) {
+    const info = LOCK.info;
+    if (!info || !info.has) return Promise.resolve(true);
+    return new Promise((resolve) => {
+      const d = lockEl();
+      const onDone = async (raw, node) => {
+        if (LOCK.waiting) return;
+        lockMsg("Tekşirilmoqda…");
+        try {
+          const r = await api("/lock/check", { method: "POST", body: { secret: await lockSecret(info.kind, raw, info.salt) } });
+          LOCK.token = r.token;
+          lockHide();
+          haptic("success");
+          resolve(true);
+        } catch (e) {
+          const w = e.data && e.data.wait;
+          if (w) return lockCountdown(w, node);
+          lockFail(node, e.status === 403 ? `Notöğri kod. Yana ${e.data && e.data.left != null ? e.data.left : "bir necha"} ta urinish` : "Ulanib bölmadi — qayta urinib köring");
+        }
+      };
+      const pad = info.kind === "pattern" ? patternPad(onDone) : pinPad(onDone);
+      d.replaceChildren(...lockHead(tr("Tasdiqlang"), tr(why || "Ma'lumotni çiqarib oliş uçun kiriş kodini kiriting")), ...pad,
+        el("button", { class: "lk-link", onclick: () => { clearInterval(LOCK.waiting); LOCK.waiting = null; lockHide(); resolve(false); } }, "Bekor qiliş"));
+    });
+  }
+
   /** Ilovaga kiriş: kod örnatilmagan bölsa — örnatiş, bölsa — kiritiş. */
   async function lockGate() {
     if (LOCK.token) return;
@@ -2794,7 +2864,7 @@
     if (document.hidden) { LOCK.hiddenAt = Date.now(); return; }
     if (LOCK.token && LOCK.hiddenAt && Date.now() - LOCK.hiddenAt > 60_000) {
       LOCK.token = null;
-      lockGate().catch(() => {});
+      lockGate().then(() => codeUnlock()).catch(() => {});
     }
   });
   function lockSettings() {
@@ -2844,6 +2914,7 @@
       await lockGate();
       await Promise.all([loadMe(), loadKeys()]);
       try { V.transfer = await api("/recovery/status"); } catch (_) {}
+      await codeUnlock();
     } catch (e) {
       $("tabVault").replaceChildren(el("div", { class: "empty" }, el("h2", null, e.status === 401 ? "Kiriş tasdiqlanmadi" : "Ulanib bölmadi"),
         el("div", null, e.status === 401 ? "Mini App'ni bot menyusidan qayta oçing." : "Birozdan keyin qayta urinib köring."),
